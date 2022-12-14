@@ -6,6 +6,10 @@ if(! "book" %in% list.dirs()){
   dir.create("book")
 }
 
+if(! "docs" %in% list.dirs()){
+  dir.create("docs")
+}
+
 # create gitbook 
 if(! "index.Rmd" %in% list.files("book")){
   bookdown::create_gitbook("book")
