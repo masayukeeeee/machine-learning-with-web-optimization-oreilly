@@ -5,7 +5,7 @@ Goal : Rで実装してGithub pagesで公開する
 
 # Management
 
-- 'book' ブランチにプッシュされた時にサイトを公開する
+- 'main' ブランチにプッシュされた時にサイトを公開する
 
 ## Rendering
 
