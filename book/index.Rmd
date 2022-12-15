@@ -41,6 +41,10 @@ header-includes:
 github-repo: https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io
 ---
 
+```{r import-pkgs, echo=FALSE, message=FALSE, warning=FALSE}
+require(tidyverse)
+require(knitr)
+```
 
 # 概要
 
