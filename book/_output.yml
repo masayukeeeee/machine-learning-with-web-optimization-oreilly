@@ -3,15 +3,13 @@ bookdown::gitbook:
   config:
     toc:
       before: |
-        <li><a href="./">A Minimal Book Example</a></li>
+        <li><a href="./">ウェブ最適化ではじめる機械学習 in R</a></li>
       after: |
-        <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
-    edit: https://github.com/USERNAME/REPO/edit/BRANCH/%s
-    download: ["pdf", "epub"]
+        <li><a href="https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io" target="blank">GitHub repository</a></li>
+    download: ["webops-and-ml-in-r.pdf"]
 bookdown::pdf_book:
   includes:
     in_header: preamble.tex
   latex_engine: xelatex
   citation_package: natbib
   keep_tex: yes
-bookdown::epub_book: default
