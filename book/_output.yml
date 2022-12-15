@@ -6,7 +6,7 @@ bookdown::gitbook:
         <li><a href="./">ウェブ最適化ではじめる機械学習 in R</a></li>
       after: |
         <li><a href="https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io" target="blank">GitHub repository</a></li>
-    download: [["webops-and-ml-in-r.pdf", "PDF"]]
+    download: [["docs/webops-and-ml-in-r.pdf", "PDF"]]
     info: false
 bookdown::pdf_book:
   includes:
