@@ -2,12 +2,16 @@ require(tidyverse)
 require(bookdown)
 
 # create book directory
-if(! "book" %in% list.dirs()){
+if(! "./book" %in% list.dirs()){
   dir.create("book")
+}else{
+  message("book dir already exists.")
 }
 
-if(! "docs" %in% list.dirs()){
+if(! "./docs" %in% list.dirs()){
   dir.create("docs")
+}else{
+  message("docs dir already exists.")
 }
 
 # create gitbook 
