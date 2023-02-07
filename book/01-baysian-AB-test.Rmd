@@ -13,7 +13,7 @@
 - あるECサイトがあり，企業Xが運営している．
 - Xの従業員2人がそれぞれ異なるページの改善を目的にA/Bテストを実施，レポートを作成した．
 
-```{r reports, echo=FALSE, fig.cap="仮想のA/Bテストレポート1", ref.label="01-01-reports"}
+```{r reports, echo=FALSE, fig.cap="仮想のA/Bテストレポート1"}
 AB_reports <- tibble(
   analyst = rep(c("Alice", "Bob"), each=3),
   description = rep(c("表示回数", "クリック数", "クリック率"), 2),
@@ -25,7 +25,7 @@ vdf <- AB_reports %>%
   group_by(analyst, description) %>% 
   summarise(A = max(A), B = max(B), .groups = "drop")
 
-knitr::kable(vdf)
+knitr::kable(vdf, label="reports", caption="AliceとBobのレポート")
 ```
 
 どちらの結果もB案の方がクリック率の意味で良い，という内容になっている．
@@ -392,7 +392,7 @@ results %>%
 
 ## レポートデータを用いた推論 {#01-06-bayse-inference-with-reports}
 
-表\@ref{fig:01-01-reports}のデータに基づいたベイズ推論を実行してみよう．
+表 \@ref(tab:reports) のデータに基づいたベイズ推論を実行してみよう．
 簡単のため，さらにメタ的な関数を実装しておく．
 また繰り返しの回数が多くなるので，２項分布を用いた形に書き直しておこう．
 

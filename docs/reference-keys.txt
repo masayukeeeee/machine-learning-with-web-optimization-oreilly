@@ -1,3 +1,4 @@
+tab:reports
 fig:discrete-approximation
 fig:approx-probability-mass-function
 eq:additive-property
