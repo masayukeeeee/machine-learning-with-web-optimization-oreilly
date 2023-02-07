@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>ウェブ最適化ではじめる機械学習 in R</title>
+  <title>1.2 離散化による確率密度関数の近似 | ウェブ最適化ではじめる機械学習 in R</title>
   <meta name="description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
   <meta name="generator" content="bookdown 0.32 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="ウェブ最適化ではじめる機械学習 in R" />
+  <meta property="og:title" content="1.2 離散化による確率密度関数の近似 | ウェブ最適化ではじめる機械学習 in R" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
   <meta name="github-repo" content="https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="ウェブ最適化ではじめる機械学習 in R" />
+  <meta name="twitter:title" content="1.2 離散化による確率密度関数の近似 | ウェブ最適化ではじめる機械学習 in R" />
   
   <meta name="twitter:description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-
-<link rel="next" href="id_01-intro.html"/>
+<link rel="prev" href="id_01-01-situation.html"/>
+<link rel="next" href="id_01-03-additve-and-multiplication-theorem.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -209,21 +209,65 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">ウェブ最適化ではじめる機械学習 in R</h1>
-<p class="author"><em>Masayuki Sakai</em></p>
-<p class="date"><em>2023-02-08</em></p>
+<div id="id_01-02-pdf-approximation" class="section level2 hasAnchor" number="1.2">
+<h2><span class="header-section-number">1.2</span> 離散化による確率密度関数の近似<a href="id_01-02-pdf-approximation.html#id_01-02-pdf-approximation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>以下のような関数<span class="math inline">\(f:[-1, 1] \rightarrow [0, 1]\)</span>を考えてみる．</p>
+<p><span class="math display">\[
+  f(x) = \begin{cases}
+    x + 1 &amp; (-1 \leq x \leq 0) \\
+    -x + 1 &amp; (0 &lt; x \leq 1)
+  \end{cases}
+\]</span>
+この時定義域<span class="math inline">\([-1, 1]\)</span>を適当な数<span class="math inline">\(n\)</span>で均等に分割して，その中央値をその領域の関数値とした階段関数で近似すると以下のようになる．</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="id_01-02-pdf-approximation.html#cb1-1" aria-hidden="true" tabindex="-1"></a>sample_n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb1-2"><a href="id_01-02-pdf-approximation.html#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="id_01-02-pdf-approximation.html#cb1-3" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb1-4"><a href="id_01-02-pdf-approximation.html#cb1-4" aria-hidden="true" tabindex="-1"></a>  ans <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(x <span class="sc">&lt;=</span> <span class="dv">0</span>, x<span class="sc">+</span><span class="dv">1</span>, <span class="sc">-</span>x<span class="sc">+</span><span class="dv">1</span>)</span>
+<span id="cb1-5"><a href="id_01-02-pdf-approximation.html#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(ans) </span>
+<span id="cb1-6"><a href="id_01-02-pdf-approximation.html#cb1-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-7"><a href="id_01-02-pdf-approximation.html#cb1-7" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="at">length.out=</span>sample_n)</span>
+<span id="cb1-8"><a href="id_01-02-pdf-approximation.html#cb1-8" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">f</span>(x)</span>
+<span id="cb1-9"><a href="id_01-02-pdf-approximation.html#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="id_01-02-pdf-approximation.html#cb1-10" aria-hidden="true" tabindex="-1"></a>splits_n <span class="ot">&lt;-</span> <span class="dv">21</span></span>
+<span id="cb1-11"><a href="id_01-02-pdf-approximation.html#cb1-11" aria-hidden="true" tabindex="-1"></a>splits_x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="at">length.out=</span>splits_n)</span>
+<span id="cb1-12"><a href="id_01-02-pdf-approximation.html#cb1-12" aria-hidden="true" tabindex="-1"></a>splits_y <span class="ot">&lt;-</span> <span class="fu">apply</span>(<span class="fu">cbind</span>(splits_x[<span class="dv">1</span><span class="sc">:</span>(splits_n<span class="dv">-1</span>)], splits_x[<span class="dv">2</span><span class="sc">:</span>splits_n]), </span>
+<span id="cb1-13"><a href="id_01-02-pdf-approximation.html#cb1-13" aria-hidden="true" tabindex="-1"></a>                  <span class="dv">1</span>, </span>
+<span id="cb1-14"><a href="id_01-02-pdf-approximation.html#cb1-14" aria-hidden="true" tabindex="-1"></a>                  <span class="cf">function</span>(x){<span class="fu">f</span>(<span class="fu">median</span>(x))})</span>
+<span id="cb1-15"><a href="id_01-02-pdf-approximation.html#cb1-15" aria-hidden="true" tabindex="-1"></a>discretize_x <span class="ot">&lt;-</span> splits_x[<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>, <span class="fu">rep</span>(<span class="dv">2</span><span class="sc">:</span>(splits_n<span class="dv">-1</span>), <span class="at">each=</span><span class="dv">4</span>), splits_n, splits_n)]</span>
+<span id="cb1-16"><a href="id_01-02-pdf-approximation.html#cb1-16" aria-hidden="true" tabindex="-1"></a>discretize_y <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(<span class="fu">rbind</span>(<span class="dv">0</span>, splits_y, splits_y, <span class="dv">0</span>))</span>
+<span id="cb1-17"><a href="id_01-02-pdf-approximation.html#cb1-17" aria-hidden="true" tabindex="-1"></a>label <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;f(x)&quot;</span>, <span class="fu">length</span>(x)), </span>
+<span id="cb1-18"><a href="id_01-02-pdf-approximation.html#cb1-18" aria-hidden="true" tabindex="-1"></a>           <span class="fu">rep</span>(<span class="st">&quot;Discretized f(x)&quot;</span>, <span class="fu">length</span>(discretize_x)))</span>
+<span id="cb1-19"><a href="id_01-02-pdf-approximation.html#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="id_01-02-pdf-approximation.html#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
+<span id="cb1-21"><a href="id_01-02-pdf-approximation.html#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">x=</span><span class="fu">c</span>(x, discretize_x), </span>
+<span id="cb1-22"><a href="id_01-02-pdf-approximation.html#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">y=</span><span class="fu">c</span>(y, discretize_y),</span>
+<span id="cb1-23"><a href="id_01-02-pdf-approximation.html#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">f=</span><span class="fu">factor</span>(label, <span class="at">levels=</span><span class="fu">c</span>(<span class="st">&quot;f(x)&quot;</span>, <span class="st">&quot;Discretized f(x)&quot;</span>))</span>
+<span id="cb1-24"><a href="id_01-02-pdf-approximation.html#cb1-24" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-25"><a href="id_01-02-pdf-approximation.html#cb1-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>x, <span class="at">y=</span>y, <span class="at">group=</span>f)) <span class="sc">+</span></span>
+<span id="cb1-26"><a href="id_01-02-pdf-approximation.html#cb1-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">color=</span>f))</span></code></pre></div>
+<div class="figure"><span style="display:block;" id="fig:discrete-approximation"></span>
+<img src="_main_files/figure-html/discrete-approximation-1.png" alt="pdf $f(x)$と離散化近似した関数" width="672" />
+<p class="caption">
+Figure 1.1: pdf <span class="math inline">\(f(x)\)</span>と離散化近似した関数
+</p>
 </div>
-<div id="id_00-intro" class="section level1 unnumbered hasAnchor">
-<h1>概要<a href="index.html#id_00-intro" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>本稿は<span class="citation">(<a href="#ref-main-book" role="doc-biblioref">飯塚修平 2020</a>)</span>の学習と実装をRで行ったものをまとめたものである．
-また，このbookの内容はRの実装も含めて<a href="https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io">GitHubのリポジトリ</a>で公開している．</p>
-
-</div>
-<h3>References<a href="id_99_references.html#id_99_references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-main-book" class="csl-entry">
-飯塚修平. 2020. <em>ウェブ最適化ではじめる機械学習</em>. O’REILLY. <a href="https://www.oreilly.co.jp/books/9784873119168/">https://www.oreilly.co.jp/books/9784873119168/</a>.
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="id_01-02-pdf-approximation.html#cb2-1" aria-hidden="true" tabindex="-1"></a>splits_n <span class="ot">&lt;-</span> <span class="dv">21</span></span>
+<span id="cb2-2"><a href="id_01-02-pdf-approximation.html#cb2-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="at">length.out=</span>splits_n)</span>
+<span id="cb2-3"><a href="id_01-02-pdf-approximation.html#cb2-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">apply</span>(<span class="fu">cbind</span>(x[<span class="dv">1</span><span class="sc">:</span>(splits_n<span class="dv">-1</span>)], x[<span class="dv">2</span><span class="sc">:</span>splits_n]), </span>
+<span id="cb2-4"><a href="id_01-02-pdf-approximation.html#cb2-4" aria-hidden="true" tabindex="-1"></a>                  <span class="dv">1</span>, </span>
+<span id="cb2-5"><a href="id_01-02-pdf-approximation.html#cb2-5" aria-hidden="true" tabindex="-1"></a>                  median)</span>
+<span id="cb2-6"><a href="id_01-02-pdf-approximation.html#cb2-6" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">f</span>(x)</span>
+<span id="cb2-7"><a href="id_01-02-pdf-approximation.html#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
+<span id="cb2-8"><a href="id_01-02-pdf-approximation.html#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> x,</span>
+<span id="cb2-9"><a href="id_01-02-pdf-approximation.html#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> y</span>
+<span id="cb2-10"><a href="id_01-02-pdf-approximation.html#cb2-10" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-11"><a href="id_01-02-pdf-approximation.html#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>x, <span class="at">y=</span>y)) <span class="sc">+</span></span>
+<span id="cb2-12"><a href="id_01-02-pdf-approximation.html#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">&quot;identity&quot;</span>)</span></code></pre></div>
+<div class="figure"><span style="display:block;" id="fig:approx-probability-mass-function"></span>
+<img src="_main_files/figure-html/approx-probability-mass-function-1.png" alt="$f(x)$を確率質量関数で近似した結果" width="672" />
+<p class="caption">
+Figure 1.2: <span class="math inline">\(f(x)\)</span>を確率質量関数で近似した結果
+</p>
 </div>
 </div>
             </section>
@@ -231,8 +275,8 @@ div.csl-indent {
           </div>
         </div>
       </div>
-
-<a href="id_01-intro.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="id_01-01-situation.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="id_01-03-additve-and-multiplication-theorem.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

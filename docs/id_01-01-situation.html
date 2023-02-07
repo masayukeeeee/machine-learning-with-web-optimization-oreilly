@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>ウェブ最適化ではじめる機械学習 in R</title>
+  <title>1.1 状況設定 | ウェブ最適化ではじめる機械学習 in R</title>
   <meta name="description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
   <meta name="generator" content="bookdown 0.32 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="ウェブ最適化ではじめる機械学習 in R" />
+  <meta property="og:title" content="1.1 状況設定 | ウェブ最適化ではじめる機械学習 in R" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
   <meta name="github-repo" content="https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="ウェブ最適化ではじめる機械学習 in R" />
+  <meta name="twitter:title" content="1.1 状況設定 | ウェブ最適化ではじめる機械学習 in R" />
   
   <meta name="twitter:description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-
-<link rel="next" href="id_01-intro.html"/>
+<link rel="prev" href="id_01-intro.html"/>
+<link rel="next" href="id_01-02-pdf-approximation.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -209,21 +209,31 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">ウェブ最適化ではじめる機械学習 in R</h1>
-<p class="author"><em>Masayuki Sakai</em></p>
-<p class="date"><em>2023-02-08</em></p>
-</div>
-<div id="id_00-intro" class="section level1 unnumbered hasAnchor">
-<h1>概要<a href="index.html#id_00-intro" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>本稿は<span class="citation">(<a href="#ref-main-book" role="doc-biblioref">飯塚修平 2020</a>)</span>の学習と実装をRで行ったものをまとめたものである．
-また，このbookの内容はRの実装も含めて<a href="https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io">GitHubのリポジトリ</a>で公開している．</p>
-
-</div>
-<h3>References<a href="id_99_references.html#id_99_references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-main-book" class="csl-entry">
-飯塚修平. 2020. <em>ウェブ最適化ではじめる機械学習</em>. O’REILLY. <a href="https://www.oreilly.co.jp/books/9784873119168/">https://www.oreilly.co.jp/books/9784873119168/</a>.
+<div id="id_01-01-situation" class="section level2 hasAnchor" number="1.1">
+<h2><span class="header-section-number">1.1</span> 状況設定<a href="id_01-01-situation.html#id_01-01-situation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>ここでは以下のような状況を想定して議論を進める．</p>
+<ul>
+<li>あるECサイトがあり，企業Xが運営している．</li>
+<li>Xの従業員2人がそれぞれ異なるページの改善を目的にA/Bテストを実施，レポートを作成した．</li>
+</ul>
+<p>どちらの結果もB案の方がクリック率の意味で良い，という内容になっている．
+しかし，試行回数を見ると明らかにBobの方が多く信頼できそうである．</p>
+<p>一方，Aliceの方の結果も正しいとするならば，より少ないサンプルで答えを導き出せた
+という意味で優秀と考えられる．</p>
+<div id="データ生成のプロセス" class="section level3 hasAnchor" number="1.1.1">
+<h3><span class="header-section-number">1.1.1</span> データ生成のプロセス<a href="id_01-01-situation.html#データ生成のプロセス" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>あるページについて異なるデザイン（A/B）を作成してテストした結果，クリック率が異なる．
+という状況から，デザインが異なれば（真の）クリック率も異なるという仮説が立てられる．
+ただし，この段階ではテストの結果がそのまま妥当なのかどうかは不明である．<span class="math inline">\(\text{ctr}_A &gt; \text{ctr}_B\)</span>とか<span class="math inline">\(\text{ctr}_A &lt; \text{ctr}_B\)</span>のような関係の正当性は主張できない．</p>
+<p>いま<span class="math inline">\(\theta_i = \text{ctr}_i\)</span>と表しておくと，これは割合であることから</p>
+<p><span class="math display">\[
+  \theta_i \in [0, 1]
+\]</span>
+とできる．これはあるユーザーがページ<span class="math inline">\(i\)</span>を訪れたときにクリックする確率と解釈できる．
+また実際にクリックした場合を<span class="math inline">\(r=1\)</span>，しなかった場合を<span class="math inline">\(r=0\)</span>としておく．</p>
+<p>ここでは単純にクリック<span class="math inline">\(r\)</span>が生起確率<span class="math inline">\(\theta\)</span>のベルヌーイ分布<span class="math inline">\(p(r|\theta)\)</span>に従うと考えていく．
+また，<span class="math inline">\(\theta\)</span>自体も確率変数であり<span class="math inline">\(p(\theta)\)</span>というある確率分布に従うと考える．</p>
+<p><span class="math inline">\(p(\theta)\)</span>をどのように設定するかは分析者に委ねられる．</p>
 </div>
 </div>
             </section>
@@ -231,8 +241,8 @@ div.csl-indent {
           </div>
         </div>
       </div>
-
-<a href="id_01-intro.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="id_01-intro.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="id_01-02-pdf-approximation.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

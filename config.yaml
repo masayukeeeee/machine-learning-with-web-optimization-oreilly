@@ -1,0 +1,7 @@
+packages:
+  - tidyverse
+  - tidymodels
+  - bookdown
+  - plotly
+  - glue
+  - gridExtra

@@ -41,8 +41,12 @@ header-includes:
 github-repo: https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io
 ---
 
+```{r import-pkgs, echo=FALSE, message=FALSE, warning=FALSE}
+require(tidyverse)
+require(knitr)
+```
 
-# 概要
+# 概要 {-#00-intro}
 
 本稿は[@main-book]の学習と実装をRで行ったものをまとめたものである．
 また，このbookの内容はRの実装も含めて[GitHubのリポジトリ](https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io)で公開している．
