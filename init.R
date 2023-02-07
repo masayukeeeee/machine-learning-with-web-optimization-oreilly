@@ -1,5 +1,16 @@
-require(tidyverse)
-require(bookdown)
+require(base)
+require(utils)
+require(yaml)
+
+# import libraries
+config <- read_yaml("config.yaml")
+pkgs <- config$packages
+for(pkg in pkgs){
+  if(!require(pkg, character.only=T)){
+    install.packages(pkg, repos="https://cran.ism.ac.jp/")
+  }
+  require(pkg, character.only=T)
+}
 
 # create book directory
 if(! "./book" %in% list.dirs()){
@@ -26,3 +37,10 @@ if(! "index.Rmd" %in% list.files("book")){
                 "book/06-share.Rmd",
                 "book/07-references.Rmd"))
 }
+
+# def render function
+quick_render <- function(){
+  bookdown::render_book("book", output_dir="../docs")
+}
+
+message("- You can [quick_render()] function when working dir is root. ")

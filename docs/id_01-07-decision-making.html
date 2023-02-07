@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>1.7 事後分布から決断を下す | ウェブ最適化ではじめる機械学習 in R</title>
+  <meta name="description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
+  <meta name="generator" content="bookdown 0.32 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="1.7 事後分布から決断を下す | ウェブ最適化ではじめる機械学習 in R" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
+  <meta name="github-repo" content="https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="1.7 事後分布から決断を下す | ウェブ最適化ではじめる機械学習 in R" />
+  
+  <meta name="twitter:description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
+  
+
+<meta name="author" content="Masayuki Sakai" />
+
+
+<meta name="date" content="2023-02-08" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="id_01-06-bayse-inference-with-reports.html"/>
+<link rel="next" href="id_99_references.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<script src="libs/plotly-binding-4.10.0/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">ウェブ最適化ではじめる機械学習 in R</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>概要</a></li>
+<li class="chapter" data-level="1" data-path="id_01-intro.html"><a href="id_01-intro.html"><i class="fa fa-check"></i><b>1</b> A/Bテストから始めよう：ベイズ統計による仮説検定入門</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="id_01-01-situation.html"><a href="id_01-01-situation.html"><i class="fa fa-check"></i><b>1.1</b> 状況設定</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="id_01-01-situation.html"><a href="id_01-01-situation.html#データ生成のプロセス"><i class="fa fa-check"></i><b>1.1.1</b> データ生成のプロセス</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="id_01-02-pdf-approximation.html"><a href="id_01-02-pdf-approximation.html"><i class="fa fa-check"></i><b>1.2</b> 離散化による確率密度関数の近似</a></li>
+<li class="chapter" data-level="1.3" data-path="id_01-03-additve-and-multiplication-theorem.html"><a href="id_01-03-additve-and-multiplication-theorem.html"><i class="fa fa-check"></i><b>1.3</b> 加法定理・乗法定理</a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="id_01-03-additve-and-multiplication-theorem.html"><a href="id_01-03-additve-and-multiplication-theorem.html#周辺化周辺分布"><i class="fa fa-check"></i><b>1.3.1</b> 周辺化・周辺分布</a></li>
+<li class="chapter" data-level="1.3.2" data-path="id_01-03-additve-and-multiplication-theorem.html"><a href="id_01-03-additve-and-multiplication-theorem.html#連続値の場合"><i class="fa fa-check"></i><b>1.3.2</b> 連続値の場合</a></li>
+<li class="chapter" data-level="1.3.3" data-path="id_01-03-additve-and-multiplication-theorem.html"><a href="id_01-03-additve-and-multiplication-theorem.html#ベイズの定理"><i class="fa fa-check"></i><b>1.3.3</b> ベイズの定理</a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="id_01-04-bayse-inference.html"><a href="id_01-04-bayse-inference.html"><i class="fa fa-check"></i><b>1.4</b> ベイズの定理を使ったクリック率の推論</a></li>
+<li class="chapter" data-level="1.5" data-path="id_01-05-implementation-in-r.html"><a href="id_01-05-implementation-in-r.html"><i class="fa fa-check"></i><b>1.5</b> Rでの実装</a></li>
+<li class="chapter" data-level="1.6" data-path="id_01-06-bayse-inference-with-reports.html"><a href="id_01-06-bayse-inference-with-reports.html"><i class="fa fa-check"></i><b>1.6</b> レポートデータを用いた推論</a></li>
+<li class="chapter" data-level="1.7" data-path="id_01-07-decision-making.html"><a href="id_01-07-decision-making.html"><i class="fa fa-check"></i><b>1.7</b> 事後分布から決断を下す</a>
+<ul>
+<li class="chapter" data-level="1.7.1" data-path="id_01-07-decision-making.html"><a href="id_01-07-decision-making.html#id_01-07-01-statistics"><i class="fa fa-check"></i><b>1.7.1</b> 要約統計量</a></li>
+<li class="chapter" data-level="1.7.2" data-path="id_01-07-decision-making.html"><a href="id_01-07-decision-making.html#id_01-07-test-widh-hdi"><i class="fa fa-check"></i><b>1.7.2</b> HDIをつかった仮設検定</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="id_99_references.html"><a href="id_99_references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io" target="blank">GitHub repository</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">ウェブ最適化ではじめる機械学習 in R</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="id_01-07-decision-making" class="section level2 hasAnchor" number="1.7">
+<h2><span class="header-section-number">1.7</span> 事後分布から決断を下す<a href="id_01-07-decision-making.html#id_01-07-decision-making" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>ベイズ推論で得られた事後分布の特徴を数値化したり，事後分布からのサンプルを利用することで意思決定に有用な情報を得ることができる．</p>
+<div id="id_01-07-01-statistics" class="section level3 hasAnchor" number="1.7.1">
+<h3><span class="header-section-number">1.7.1</span> 要約統計量<a href="id_01-07-decision-making.html#id_01-07-01-statistics" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="definition">
+<p><span id="def:01-07-expected-value" class="definition"><strong>Definition 1.1  (期待値) </strong></span>連続・離散の確率分布に対して期待値をそれぞれ以下のように定義する．
+<span class="math display">\[\begin{align}
+  E[x] = \begin{cases}
+    \int_{-\infty}^{\infty} xp(x) dx, &amp; \text{continuous}
+    \sum{x} x p(x), &amp; \text{discrete}
+  \end{cases}
+\end{align}\]</span></p>
+</div>
+<div class="definition">
+<p><span id="def:01-07-variance" class="definition"><strong>Definition 1.2  (分散) </strong></span>分散は次のように定義される．
+<span class="math display">\[\begin{align}
+  V[x] = E[(x-E[x])^2]
+\end{align}\]</span>
+また<span class="math inline">\(\sqrt{V[x]}\)</span>を標準偏差と呼ぶ．</p>
+</div>
+<div class="definition">
+<p><span id="def:01-07-sample-mean-var" class="definition"><strong>Definition 1.3  (標本平均・標本分散) </strong></span>確率分布から得られたサンプルに対して，その平均<span class="math inline">\(\bar x\)</span>と分散<span class="math inline">\(s^2\)</span>を次のように定義する．これらはそれぞれ標本平均・標本分散と呼ぶ．</p>
+<p><span class="math display">\[\begin{align}
+  \bar x &amp;= \dfrac{1}{n}\sum_{i=1}^{n} x_i \\
+  s^2 &amp;= \dfrac1n \sum_{i=1}^{n} (x_i - \bar x)^2
+\end{align}\]</span></p>
+<p>標本平均については，サンプルが独立で同一の分布に従う(independent identity distribution)とき，<span class="math inline">\(n \rightarrow \infty\)</span>で分布の期待値に収束することが知られている（大数の法則）．
+これを
+<span class="math display">\[\begin{align}
+  \bar x \longrightarrow E[x] \ (n \rightarrow \infty)
+\end{align}\]</span>
+と表す．</p>
+</div>
+<div class="definition">
+<p><span id="def:01-07-hdi" class="definition"><strong>Definition 1.4  (HDI:highest density interval) </strong></span>連続型の確率分布に対して，以下のように定義される量をHDI(highest density interval)と呼ぶ．
+<span class="math display">\[\begin{align}
+  \int_{p(x)&gt;t} p(x) dx = \dfrac{\alpha}{100}
+\end{align}\]</span>
+ここで<span class="math inline">\(t\)</span>は閾値でこの値よりも確率密度が高い区間で埋めていって<span class="math inline">\(\alpha\)</span>に一致する点となる．
+HDIは確率変数の値が高い確率で現れる区間を表していて，例えば<span class="math inline">\(\alpha = 0.95\)</span>のとき95%HDIと呼ばれ，確率<span class="math inline">\(0.95\)</span>を占めるまでの確率密度が高いものから埋めて行った区域となる．</p>
+<p>確率分布が複数の山（ピーク）を持つ場合，HDIは複数の区域に分かれることがある．</p>
+</div>
+</div>
+<div id="id_01-07-test-widh-hdi" class="section level3 hasAnchor" number="1.7.2">
+<h3><span class="header-section-number">1.7.2</span> HDIをつかった仮設検定<a href="id_01-07-decision-making.html#id_01-07-test-widh-hdi" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>本来連続型の確率分布に対して定義されているHDIだが，同様の考え方を用いで離散型の確率分布にも適用してみよう．
+ここでは，確率質量が多い確率変数の値を順に追加していく，という操作をする．</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="id_01-07-decision-making.html#cb16-1" aria-hidden="true" tabindex="-1"></a>hmv <span class="ot">&lt;-</span> <span class="cf">function</span>(xs, ps, <span class="at">alpha=</span><span class="fl">0.95</span>){</span>
+<span id="cb16-2"><a href="id_01-07-decision-making.html#cb16-2" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">xs=</span>xs, <span class="at">ps=</span>ps) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-3"><a href="id_01-07-decision-making.html#cb16-3" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">arrange</span>(<span class="fu">desc</span>(ps)) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-4"><a href="id_01-07-decision-making.html#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">cumsum_ps =</span> <span class="fu">cumsum</span>(ps))</span>
+<span id="cb16-5"><a href="id_01-07-decision-making.html#cb16-5" aria-hidden="true" tabindex="-1"></a>  hmv_range <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb16-6"><a href="id_01-07-decision-making.html#cb16-6" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(cumsum_ps <span class="sc">&lt;=</span> alpha) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-7"><a href="id_01-07-decision-making.html#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>(xs) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-8"><a href="id_01-07-decision-making.html#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">range</span>()</span>
+<span id="cb16-9"><a href="id_01-07-decision-making.html#cb16-9" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb16-10"><a href="id_01-07-decision-making.html#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">range=</span>hmv_range,</span>
+<span id="cb16-11"><a href="id_01-07-decision-making.html#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">x=</span>df</span>
+<span id="cb16-12"><a href="id_01-07-decision-making.html#cb16-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb16-13"><a href="id_01-07-decision-making.html#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb16-14"><a href="id_01-07-decision-making.html#cb16-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="id_01-07-decision-making.html#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># AliceのA案の結果についてhmvを計算する</span></span>
+<span id="cb17-2"><a href="id_01-07-decision-making.html#cb17-2" aria-hidden="true" tabindex="-1"></a>Alice_A <span class="ot">&lt;-</span> results <span class="sc">%&gt;%</span> </span>
+<span id="cb17-3"><a href="id_01-07-decision-making.html#cb17-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(</span>
+<span id="cb17-4"><a href="id_01-07-decision-making.html#cb17-4" aria-hidden="true" tabindex="-1"></a>    name <span class="sc">==</span> <span class="st">&quot;Alice&quot;</span>,</span>
+<span id="cb17-5"><a href="id_01-07-decision-making.html#cb17-5" aria-hidden="true" tabindex="-1"></a>    type <span class="sc">==</span> <span class="st">&quot;A&quot;</span></span>
+<span id="cb17-6"><a href="id_01-07-decision-making.html#cb17-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb17-7"><a href="id_01-07-decision-making.html#cb17-7" aria-hidden="true" tabindex="-1"></a>hmv_Alice_a <span class="ot">&lt;-</span> <span class="fu">hmv</span>(<span class="at">xs=</span>Alice_A<span class="sc">$</span>thetas, <span class="at">ps=</span>Alice_A<span class="sc">$</span>p)</span>
+<span id="cb17-8"><a href="id_01-07-decision-making.html#cb17-8" aria-hidden="true" tabindex="-1"></a>hmv_Alice_a<span class="sc">$</span>range</span></code></pre></div>
+<pre><code>## [1] 0.009 0.148</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="id_01-07-decision-making.html#cb19-1" aria-hidden="true" tabindex="-1"></a>plots <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb19-2"><a href="id_01-07-decision-making.html#cb19-2" aria-hidden="true" tabindex="-1"></a>i <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb19-3"><a href="id_01-07-decision-making.html#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(tgt_name <span class="cf">in</span> <span class="fu">c</span>(<span class="st">&quot;Alice&quot;</span>, <span class="st">&quot;Bob&quot;</span>)){</span>
+<span id="cb19-4"><a href="id_01-07-decision-making.html#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(tgt_type <span class="cf">in</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>)){</span>
+<span id="cb19-5"><a href="id_01-07-decision-making.html#cb19-5" aria-hidden="true" tabindex="-1"></a>    df <span class="ot">&lt;-</span> results <span class="sc">%&gt;%</span> </span>
+<span id="cb19-6"><a href="id_01-07-decision-making.html#cb19-6" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">filter</span>(</span>
+<span id="cb19-7"><a href="id_01-07-decision-making.html#cb19-7" aria-hidden="true" tabindex="-1"></a>        name <span class="sc">==</span> tgt_name,</span>
+<span id="cb19-8"><a href="id_01-07-decision-making.html#cb19-8" aria-hidden="true" tabindex="-1"></a>        type <span class="sc">==</span> tgt_type</span>
+<span id="cb19-9"><a href="id_01-07-decision-making.html#cb19-9" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb19-10"><a href="id_01-07-decision-making.html#cb19-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb19-11"><a href="id_01-07-decision-making.html#cb19-11" aria-hidden="true" tabindex="-1"></a>    fill_range <span class="ot">&lt;-</span> <span class="fu">hmv</span>(<span class="at">xs=</span>df<span class="sc">$</span>thetas, <span class="at">ps=</span>df<span class="sc">$</span>p)<span class="sc">$</span>range</span>
+<span id="cb19-12"><a href="id_01-07-decision-making.html#cb19-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb19-13"><a href="id_01-07-decision-making.html#cb19-13" aria-hidden="true" tabindex="-1"></a>    bounds <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb19-14"><a href="id_01-07-decision-making.html#cb19-14" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">filter</span>(</span>
+<span id="cb19-15"><a href="id_01-07-decision-making.html#cb19-15" aria-hidden="true" tabindex="-1"></a>        thetas <span class="sc">&gt;</span> fill_range[<span class="dv">1</span>],</span>
+<span id="cb19-16"><a href="id_01-07-decision-making.html#cb19-16" aria-hidden="true" tabindex="-1"></a>        thetas <span class="sc">&lt;</span> fill_range[<span class="dv">2</span>]</span>
+<span id="cb19-17"><a href="id_01-07-decision-making.html#cb19-17" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb19-18"><a href="id_01-07-decision-making.html#cb19-18" aria-hidden="true" tabindex="-1"></a>    plots[[i]] <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb19-19"><a href="id_01-07-decision-making.html#cb19-19" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">filter</span>(thetas <span class="sc">&lt;</span> <span class="fl">0.3</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-20"><a href="id_01-07-decision-making.html#cb19-20" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>thetas, <span class="at">y=</span>p)) <span class="sc">+</span> </span>
+<span id="cb19-21"><a href="id_01-07-decision-making.html#cb19-21" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb19-22"><a href="id_01-07-decision-making.html#cb19-22" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_ribbon</span>(<span class="at">data=</span>bounds, <span class="fu">aes</span>(<span class="at">ymax=</span>p), <span class="at">ymin=</span><span class="dv">0</span>, <span class="at">fill=</span><span class="st">&quot;orange&quot;</span>, <span class="at">alpha=</span><span class="fl">0.5</span>)</span>
+<span id="cb19-23"><a href="id_01-07-decision-making.html#cb19-23" aria-hidden="true" tabindex="-1"></a>    i <span class="ot">&lt;-</span> i<span class="sc">+</span><span class="dv">1</span></span>
+<span id="cb19-24"><a href="id_01-07-decision-making.html#cb19-24" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb19-25"><a href="id_01-07-decision-making.html#cb19-25" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb19-26"><a href="id_01-07-decision-making.html#cb19-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-27"><a href="id_01-07-decision-making.html#cb19-27" aria-hidden="true" tabindex="-1"></a>gridExtra<span class="sc">::</span><span class="fu">grid.arrange</span>(</span>
+<span id="cb19-28"><a href="id_01-07-decision-making.html#cb19-28" aria-hidden="true" tabindex="-1"></a>  plots[[<span class="dv">1</span>]],plots[[<span class="dv">2</span>]],plots[[<span class="dv">3</span>]],plots[[<span class="dv">4</span>]],</span>
+<span id="cb19-29"><a href="id_01-07-decision-making.html#cb19-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">nrow=</span><span class="dv">4</span></span>
+<span id="cb19-30"><a href="id_01-07-decision-making.html#cb19-30" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-44-1.png" width="672" /></p>
+
+</div>
+</div>
+<!-- </div> -->
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="id_01-06-bayse-inference-with-reports.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="id_99_references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": [["docs/webops-and-ml-in-r.pdf", "PDF"]],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+},
+"info": false
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

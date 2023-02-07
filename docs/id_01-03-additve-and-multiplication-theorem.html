@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>ウェブ最適化ではじめる機械学習 in R</title>
+  <title>1.3 加法定理・乗法定理 | ウェブ最適化ではじめる機械学習 in R</title>
   <meta name="description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
   <meta name="generator" content="bookdown 0.32 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="ウェブ最適化ではじめる機械学習 in R" />
+  <meta property="og:title" content="1.3 加法定理・乗法定理 | ウェブ最適化ではじめる機械学習 in R" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
   <meta name="github-repo" content="https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="ウェブ最適化ではじめる機械学習 in R" />
+  <meta name="twitter:title" content="1.3 加法定理・乗法定理 | ウェブ最適化ではじめる機械学習 in R" />
   
   <meta name="twitter:description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-
-<link rel="next" href="id_01-intro.html"/>
+<link rel="prev" href="id_01-02-pdf-approximation.html"/>
+<link rel="next" href="id_01-04-bayse-inference.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -209,21 +209,99 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">ウェブ最適化ではじめる機械学習 in R</h1>
-<p class="author"><em>Masayuki Sakai</em></p>
-<p class="date"><em>2023-02-08</em></p>
+<div id="id_01-03-additve-and-multiplication-theorem" class="section level2 hasAnchor" number="1.3">
+<h2><span class="header-section-number">1.3</span> 加法定理・乗法定理<a href="id_01-03-additve-and-multiplication-theorem.html#id_01-03-additve-and-multiplication-theorem" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>確率変数<span class="math inline">\(X, Y\)</span>を考え，それぞれ<span class="math inline">\(\Omega_X = \{X_1, \ldots, X_n\}, \Omega_Y = \{Y_1, \ldots, Y_n \}\)</span>の中から実現値を得るものとする．</p>
+<p>この時<span class="math inline">\(X_i, Y_j\)</span>を同時に取る確率を<span class="math inline">\(p(X=X_i, Y=Y_j)\)</span>と表し，これを<strong>同時確率</strong>と呼ぶ．
+またこの分布<span class="math inline">\(p(X,Y)\)</span>を<strong>同時分布</strong>と呼ぶ．</p>
+<p><span class="math display">\[
+  \sum_{x \in \Omega_X, y \in \Omega_Y} p(X=x, Y=x)
+\]</span>
+とできる時，確率変数<span class="math inline">\(Y\)</span>については</p>
+<p><span class="math display" id="eq:additive-property">\[
+\begin{align}
+p(Y) = \sum_{x \in \Omega_X} p(X, Y)
+\tag{1.1}
+\end{align}
+\]</span>
+と表すことができる．また<strong>条件付き分布（conditional distribution）</strong>を</p>
+<p><span class="math display" id="eq:multiplication-property">\[
+\begin{align}
+  p(X|Y) = \frac{p(X,Y)}{p(Y)}
+  \tag{1.2}
+\end{align}
+\]</span>
+と表し，確率の乗法定理とも呼ばれる．</p>
+<div id="周辺化周辺分布" class="section level3 hasAnchor" number="1.3.1">
+<h3><span class="header-section-number">1.3.1</span> 周辺化・周辺分布<a href="id_01-03-additve-and-multiplication-theorem.html#周辺化周辺分布" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>加法定理を適用して同時分布である確率変数のみの分布を表現することを<strong>周辺化（marginalization）</strong>と呼ぶ．このようにして得られた分布を周辺分布などと呼ぶ．</p>
 </div>
-<div id="id_00-intro" class="section level1 unnumbered hasAnchor">
-<h1>概要<a href="index.html#id_00-intro" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>本稿は<span class="citation">(<a href="#ref-main-book" role="doc-biblioref">飯塚修平 2020</a>)</span>の学習と実装をRで行ったものをまとめたものである．
-また，このbookの内容はRの実装も含めて<a href="https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io">GitHubのリポジトリ</a>で公開している．</p>
-
+<div id="連続値の場合" class="section level3 hasAnchor" number="1.3.2">
+<h3><span class="header-section-number">1.3.2</span> 連続値の場合<a href="id_01-03-additve-and-multiplication-theorem.html#連続値の場合" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>連続型の確率変数<span class="math inline">\(x, y\)</span>についても加法定理と乗法定理は同様に考えることができる．</p>
+<p><span class="math display" id="eq:continuous-add-multi-props">\[
+\begin{align}
+  p(y) &amp;= \int_{\infty}^{-\infty} p(x,y) dx \\
+  p(x|y) &amp;= {p(x,y) \over p(y)}
+  \tag{1.3}
+\end{align}
+\]</span></p>
 </div>
-<h3>References<a href="id_99_references.html#id_99_references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-main-book" class="csl-entry">
-飯塚修平. 2020. <em>ウェブ最適化ではじめる機械学習</em>. O’REILLY. <a href="https://www.oreilly.co.jp/books/9784873119168/">https://www.oreilly.co.jp/books/9784873119168/</a>.
+<div id="ベイズの定理" class="section level3 hasAnchor" number="1.3.3">
+<h3><span class="header-section-number">1.3.3</span> ベイズの定理<a href="id_01-03-additve-and-multiplication-theorem.html#ベイズの定理" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>乗法定理は確率変数を交換しても成立する．</p>
+<p><span class="math display" id="eq:exchange-equiality-of-multiplication-thm">\[\begin{align}
+  \tag{1.4}
+  p(x,y) = p(x|y)p(y) = p(y|x)p(x)
+\end{align}\]</span></p>
+<p>これよりベイズの定理と呼ばれる次式を得る．</p>
+<p><span class="math display" id="eq:bayes-theorem">\[\begin{align}
+  \tag{1.5}
+  p(x|y) = \dfrac{p(y|x)p(x)}{p(y)}
+\end{align}\]</span></p>
+<p>ベイズの定理を用いて，ある確率分布の未知パラメータを観測データから推論することを<strong>ベイズ推論</strong>（Bayesian inference）と呼ぶ．</p>
+<p>ここで，観測データを<span class="math inline">\(\mathcal D\)</span>，未知パラメータを<span class="math inline">\(\theta\)</span>としてベイズの定理に当てはめると</p>
+<p><span class="math display" id="eq:bayes-inference">\[\begin{align}
+  \tag{1.6}
+  p(\theta | \mathcal D) = \dfrac{p(\mathcal D | \theta)}{p(\mathcal D)}p(\theta)
+\end{align}\]</span></p>
+<p>となる．つまり求めたいのは<span class="math inline">\(p(\theta|\mathcal D)\)</span>である．</p>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"><span class="math inline">\(p(\cdot)\)</span></th>
+<th align="left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><span class="math inline">\(p(\theta)\)</span></td>
+<td align="left">事前分布</td>
+</tr>
+<tr class="even">
+<td align="left"><span class="math inline">\(p(\theta|\mathcal D)\)</span></td>
+<td align="left">事後分布</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(p(\mathcal D | \theta)\)</span></td>
+<td align="left">尤度</td>
+</tr>
+<tr class="even">
+<td align="left"><span class="math inline">\(p(\mathcal D)\)</span></td>
+<td align="left">正規化定数．これは<span class="math inline">\(p(\mathcal D| \theta)p(\theta)\)</span>を周辺化して得られる．</td>
+</tr>
+</tbody>
+</table>
+<p>推論においてはデータ<span class="math inline">\(\mathcal D\)</span>は所与のものと考えるので，<span class="math inline">\(p(\mathcal D)\)</span>は定数とみなせること，また確率変数<span class="math inline">\(\theta\)</span>の分布のみに興味があることを強調して</p>
+<p><span class="math display" id="eq:bayse-inference-with-propto">\[\begin{align}
+  \tag{1.7}
+  p(\theta|\mathcal D) \propto p(\mathcal D | \theta) p(\theta)
+\end{align}\]</span></p>
+<p>と表現することもある．</p>
 </div>
 </div>
             </section>
@@ -231,8 +309,8 @@ div.csl-indent {
           </div>
         </div>
       </div>
-
-<a href="id_01-intro.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="id_01-02-pdf-approximation.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="id_01-04-bayse-inference.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

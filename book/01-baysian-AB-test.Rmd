@@ -6,15 +6,15 @@
 
 本章ではA/Bテストを用いて数理的に意思決定する方法を学ぶ．
 
-## 状況設定 {#01-situation}
+## 状況設定 {#01-01-situation}
 
 ここでは以下のような状況を想定して議論を進める．
 
 - あるECサイトがあり，企業Xが運営している．
-- Xの従業員がA/Bテストを実施レポートを作成した．
+- Xの従業員2人がそれぞれ異なるページの改善を目的にA/Bテストを実施，レポートを作成した．
 
-```{r reports, echo=FALSE, fig.cap="仮想のA/Bテストレポート1"}
-AB_reports <-data.frame(
+```{r reports, echo=FALSE, fig.cap="仮想のA/Bテストレポート1", ref.label="01-01-reports"}
+AB_reports <- tibble(
   analyst = rep(c("Alice", "Bob"), each=3),
   description = rep(c("表示回数", "クリック数", "クリック率"), 2),
   A = c(40, 2, 0.05, 1280, 64, 0.05),
@@ -23,7 +23,7 @@ AB_reports <-data.frame(
 
 vdf <- AB_reports %>% 
   group_by(analyst, description) %>% 
-  summarise(A = max(A), B = max(B))
+  summarise(A = max(A), B = max(B), .groups = "drop")
 
 knitr::kable(vdf)
 ```
@@ -35,4 +35,538 @@ knitr::kable(vdf)
 という意味で優秀と考えられる．
 
 ### データ生成のプロセス  
+
+あるページについて異なるデザイン（A/B）を作成してテストした結果，クリック率が異なる．
+という状況から，デザインが異なれば（真の）クリック率も異なるという仮説が立てられる．
+ただし，この段階ではテストの結果がそのまま妥当なのかどうかは不明である．$\text{ctr}_A > \text{ctr}_B$とか$\text{ctr}_A < \text{ctr}_B$のような関係の正当性は主張できない．
+
+いま$\theta_i = \text{ctr}_i$と表しておくと，これは割合であることから
+
+$$
+  \theta_i \in [0, 1]
+$$
+とできる．これはあるユーザーがページ$i$を訪れたときにクリックする確率と解釈できる．
+また実際にクリックした場合を$r=1$，しなかった場合を$r=0$としておく．
+
+ここでは単純にクリック$r$が生起確率$\theta$のベルヌーイ分布$p(r|\theta)$に従うと考えていく．
+また，$\theta$自体も確率変数であり$p(\theta)$というある確率分布に従うと考える．
+
+$p(\theta)$をどのように設定するかは分析者に委ねられる．
+
+## 離散化による確率密度関数の近似 {#01-02-pdf-approximation}
+
+以下のような関数$f:[-1, 1] \rightarrow [0, 1]$を考えてみる．
+
+$$
+  f(x) = \begin{cases}
+    x + 1 & (-1 \leq x \leq 0) \\
+    -x + 1 & (0 < x \leq 1)
+  \end{cases}
+$$
+この時定義域$[-1, 1]$を適当な数$n$で均等に分割して，その中央値をその領域の関数値とした階段関数で近似すると以下のようになる．
+
+```{r discrete-approximation, fig.cap="pdf $f(x)$と離散化近似した関数"}
+sample_n <- 1000
+
+f <- function(x) {
+  ans <- ifelse(x <= 0, x+1, -x+1)
+  return(ans) 
+}
+x <- seq(-1, 1, length.out=sample_n)
+y <- f(x)
+
+splits_n <- 21
+splits_x <- seq(-1, 1, length.out=splits_n)
+splits_y <- apply(cbind(splits_x[1:(splits_n-1)], splits_x[2:splits_n]), 
+                  1, 
+                  function(x){f(median(x))})
+discretize_x <- splits_x[c(1,1, rep(2:(splits_n-1), each=4), splits_n, splits_n)]
+discretize_y <- as.vector(rbind(0, splits_y, splits_y, 0))
+label <- c(rep("f(x)", length(x)), 
+           rep("Discretized f(x)", length(discretize_x)))
+
+data.frame(
+  x=c(x, discretize_x), 
+  y=c(y, discretize_y),
+  f=factor(label, levels=c("f(x)", "Discretized f(x)"))
+) %>% 
+  ggplot(aes(x=x, y=y, group=f)) +
+  geom_line(aes(color=f))
+```
+
+```{r approx-probability-mass-function, fig.cap="$f(x)$を確率質量関数で近似した結果"}
+splits_n <- 21
+x <- seq(-1, 1, length.out=splits_n)
+x <- apply(cbind(x[1:(splits_n-1)], x[2:splits_n]), 
+                  1, 
+                  median)
+y <- f(x)
+data.frame(
+  x = x,
+  y = y
+) %>% 
+  ggplot(aes(x=x, y=y)) +
+  geom_bar(stat = "identity")
+```
+
+
+## 加法定理・乗法定理 {#01-03-additve-and-multiplication-theorem}
+
+確率変数$X, Y$を考え，それぞれ$\Omega_X = \{X_1, \ldots, X_n\}, \Omega_Y = \{Y_1, \ldots, Y_n \}$の中から実現値を得るものとする．
+
+この時$X_i, Y_j$を同時に取る確率を$p(X=X_i, Y=Y_j)$と表し，これを**同時確率**と呼ぶ．
+またこの分布$p(X,Y)$を**同時分布**と呼ぶ．
+
+
+$$
+  \sum_{x \in \Omega_X, y \in \Omega_Y} p(X=x, Y=x)
+$$
+とできる時，確率変数$Y$については
+
+$$
+\begin{align}
+p(Y) = \sum_{x \in \Omega_X} p(X, Y)
+(\#eq:additive-property)
+\end{align}
+$$
+と表すことができる．また**条件付き分布（conditional distribution）**を
+
+$$
+\begin{align}
+  p(X|Y) = \frac{p(X,Y)}{p(Y)}
+  (\#eq:multiplication-property)
+\end{align}
+$$
+と表し，確率の乗法定理とも呼ばれる．
+
+### 周辺化・周辺分布  
+
+加法定理を適用して同時分布である確率変数のみの分布を表現することを**周辺化（marginalization）**と呼ぶ．このようにして得られた分布を周辺分布などと呼ぶ．
+
+### 連続値の場合  
+
+連続型の確率変数$x, y$についても加法定理と乗法定理は同様に考えることができる．
+
+$$
+\begin{align}
+  p(y) &= \int_{\infty}^{-\infty} p(x,y) dx \\
+  p(x|y) &= {p(x,y) \over p(y)}
+  (\#eq:continuous-add-multi-props)
+\end{align}
+$$
+
+### ベイズの定理  
+
+乗法定理は確率変数を交換しても成立する．
+
+\begin{align}
+  (\#eq:exchange-equiality-of-multiplication-thm)
+  p(x,y) = p(x|y)p(y) = p(y|x)p(x)
+\end{align}
+
+これよりベイズの定理と呼ばれる次式を得る．
+
+\begin{align}
+  (\#eq:bayes-theorem)
+  p(x|y) = \dfrac{p(y|x)p(x)}{p(y)}
+\end{align}
+
+ベイズの定理を用いて，ある確率分布の未知パラメータを観測データから推論することを**ベイズ推論**（Bayesian inference）と呼ぶ．
+
+ここで，観測データを$\mathcal D$，未知パラメータを$\theta$としてベイズの定理に当てはめると
+
+\begin{align}
+  (\#eq:bayes-inference)
+  p(\theta | \mathcal D) = \dfrac{p(\mathcal D | \theta)}{p(\mathcal D)}p(\theta)
+\end{align}
+
+となる．つまり求めたいのは$p(\theta|\mathcal D)$である．
+
+|$p(\cdot)$|description|
+|:-|:-|
+|$p(\theta)$|事前分布|
+|$p(\theta|\mathcal D)$|事後分布|
+|$p(\mathcal D | \theta)$|尤度|
+|$p(\mathcal D)$|正規化定数．これは$p(\mathcal D| \theta)p(\theta)$を周辺化して得られる．|
+
+推論においてはデータ$\mathcal D$は所与のものと考えるので，$p(\mathcal D)$は定数とみなせること，また確率変数$\theta$の分布のみに興味があることを強調して
+
+\begin{align}
+  (\#eq:bayse-inference-with-propto)
+  p(\theta|\mathcal D) \propto p(\mathcal D | \theta) p(\theta)
+\end{align}
+
+と表現することもある．
+
+## ベイズの定理を使ったクリック率の推論 {#01-04-bayse-inference}
+
+推論を実行する際に，最初にどのような事前分布を設定するかを考える必要がある．これは分析者次第となる．よく使われるものの一つとして無情報の事前分布といういみで一様分布を設定することがあり，ここではこれを採用する．
+
+$\theta$はクリック率を表す確率変数であり，$\theta \in [0,1]$なので$U(0,1)$を設定しよう．
+\begin{align}
+  (\#eq:01-04-prior-dist-no-info)
+  p(\theta) = \begin{cases}
+    1 & 0 \leq \theta \leq 1 \\
+    0 & \text{else}
+  \end{cases}
+\end{align}
+
+さらにこの$\theta$はクリック率を意味するので
+\begin{align}
+  (\#eq:01-04-r-with-theta)
+  \text{Bernoulli}(\theta) = \theta^r(1-\theta)^{(1-r)}
+\end{align}
+
+推論を行うとき，パラメータが与えられた時の$r$が発生する条件付き確率から，データが与えられた時に$\theta$を推定することと読み替えることになる．
+つまり$p(\mathcal D|\theta)$ではなく$p(\theta|\mathcal D)$を考える．これを尤度関数と呼び，一般には確率分布ではなくなる．
+
+```{r 01-04-bernoulli-3d-plot, fig.cap="ベルヌーイ分布の3D表現"}
+scene <- list(
+  "xaxis" = list(title="r"),
+  "yaxis" = list(title="theta"),
+  "zaxis" = list(title="p(r|theta)")
+)
+n <- 300
+r <- c(0,1)
+theta <- seq(0,1,length=n)
+z <- expand.grid(r,theta) %>% 
+  apply(1, function(e){
+    res <- e[2]^{e[1]}*(1-e[2])^{1-e[1]}
+    return(res)
+  }) %>% 
+  matrix(nrow=n, byrow=T)
+plot_ly(x=r, y=theta, z=z,
+        hovertemplate = "r: %{x}<br>theta: %{y}<br>p(r|theta): %{z}") %>% 
+  plotly::add_surface() %>% 
+  plotly::layout(scene=scene)
+```
+
+$p(r|\theta)$を尤度関数とみなす，つまり$r$を固定した時の$\theta$の関数と考えた時，$r=1$であれば
+\begin{align}
+  \int_{0}^{1} \theta^{r} (1-\theta)^{1-r} d\theta &= \begin{cases}
+    \int_{0}^{1} \theta d\theta, & r=1 \\
+    \int_{0}^{1} (1-\theta) d\theta, & r=0 
+  \end{cases} \\
+  &= \dfrac12
+\end{align}
+となる．全積分が1ではないため，確率分布ではないことがわかる．
+
+さてこれらの尤度関数と事前分布を\@ref{eq:bayse-inference-with-propto}式に代入すると，$\theta \in [0,1]$の範囲において考えれば$p(\theta)=1$なので
+\begin{align}
+  p(\theta | r) &= \propto p(r | \theta) p(\theta) \\
+  &= \theta^r(1-\theta)^{1-r}
+\end{align}
+となる．
+先ほどの議論と同様にこの関数は確率分布ではないため，事後分布とするために正規化定数$p(r)$で除する必要がある．
+\begin{align}
+  p(r) &= \int_{-\infty}^{\infty} p(r|\theta) p(\theta) d \theta \\
+  &= \int_0^1 \theta^r (1-\theta)^{(1-r)} d \theta \\
+  &= 
+  \begin{cases}
+    \displaystyle \int_0^1 (1-\theta) d \theta, & r=0 \\
+    \displaystyle \int_0^1 \theta d \theta, & r=1
+  \end{cases} \\
+  &= \dfrac12  
+\end{align}
+であるので，結局事後分布は
+\begin{align}
+  p(\theta | r) &= \dfrac{p(r|\theta)p(\theta)}{p(r)} \\
+  &= 2 \theta^r (1-\theta)^{(1-r)}
+\end{align}
+と求められる．これらを図示すれば
+
+```{r 01-04-posterior-dist, fig.cap="ベイズ推論によって得られた事後分布"}
+att_labs <- c("r=1", "r=0")
+names(att_labs) <- c(1,0)
+r <- c(0,1)
+theta <- seq(0,1,length=300)
+df <- expand_grid(r, theta) %>% 
+  mutate(v = 2*theta^r * (1-theta)^{1-r})
+g <- ggplot(data=df, aes(x=theta, y=v,group=r)) + 
+  geom_line() +
+  facet_wrap(~r, labeller = labeller(r=att_labs))
+plot(g)
+```
+以上は一回のデータ観測におけるベイズ推論であったが実際にはいくつかのデータが得られているはずで，その分推論を繰り返すことでデータ$\mathcal D$が観測された元での事後分布を得ることができる．ただしこの時，各データは独立であるという過程が置かれている．
+
+## Rでの実装 {#01-05-implementation-in-r}
+
+前項の例におけるベイズ推論を実装してみよう．まず，$\theta$の取りうる値のベクトルを作成する．必ずしも1001分割でなければいけないわけではない．
+
+$$
+  \tilde{\boldsymbol \theta} = (0, 0001, 0.002,\ldots,0.999, 1)
+$$
+
+```{r 01-05-thetas}
+thetas <- seq(0, 1, length=1001)
+thetas %>% head()
+```
+
+次に，尤度関数を実装する．実現値$r=1$であれば`thetas`を，$r=0$なら`1-thetas`を返す．
+
+$$
+  p(\theta|r) = \theta^r (1-\theta)^{1-r}
+$$
+
+```{r 01-05-likelihood}
+likelihood <- function(r, thetas){
+  if(r){
+    return(thetas)
+  }else{
+    return(1-thetas)
+  }
+}
+```
+
+最後に事後分布を計算する`posterior`を実装する．
+
+$$
+  p(\theta|r) = 2\theta^r(1-\theta)^{1-r}
+$$
+```{r 01-05-posterior}
+posterior <- function(r, prior, thetas){
+  lp = likelihood(r, thetas) * prior
+  return(lp / sum(lp)) # 尤度関数と事前分布の積をその和で割って正規化しておく
+}
+```
+
+ベイズ推論を行う前に，事前分布を作成しておこう．事前分布は一様分布としていたので以下のようになる．
+
+```{r 01-05-prior}
+prior <- rep(1/length(thetas), length(thetas))
+```
+
+ではベイズ推論を実行する．
+
+```{r 01-05-bayse-inference}
+p <- posterior(r=1, prior, thetas)
+tibble(thetas=thetas, p=p, prior=prior) %>% 
+  pivot_longer(cols=c(p,prior), names_to="distribution", values_to="prob") %>% 
+  ggplot(aes(x=thetas, y=prob, 
+             group=distribution, color=distribution)) +
+  geom_line()
+
+```
+
+さらに繰り返しベイズ推論を実行して変化を見てみよう．いま得られたデータとしてはクリックが2，でクリックなしが38だったので，この順番には意味がないとすれば以下のように実装できる．
+
+```{r 01-05-bayse-inference-with-alice}
+len_n <- 1001
+thetas <- seq(0,1,length=len_n)
+click = c(rep(1,2), rep(0, 38))
+p <- rep(1/len_n, len_n)
+results <- tibble(
+  thetas=thetas,
+  p=p,
+  iteration=0
+)
+for(i in 1:length(click)){
+  r <- click[i]
+  p <- posterior(r=r, prior=p, thetas=thetas)
+  results <- bind_rows(
+    results,
+    tibble(
+      thetas=thetas,
+      p=p,
+      iteration=i
+    )
+  )
+}
+```
+
+事後分布の変化の様子をプロットしてみよう．
+
+```{r 01-05-show-how-move-posterior, fig.cap="ベイズ推論の繰り返しによる事後分布の変遷"}
+max_value <- results %>% 
+  dplyr::filter(iteration==max(iteration),
+                p==max(p)) %>% 
+  pull(thetas)
+
+results %>% 
+  ggplot(aes(x=thetas, y=p, group=iteration, color=iteration)) +
+  geom_line() +
+  geom_vline(xintercept=max_value, color="orange")
+```
+
+最終的には0.05付近に最も大きな値をもつ事後分布が得られていることがわかる（黄色の縦線）．
+
+## レポートデータを用いた推論 {#01-06-bayse-inference-with-reports}
+
+表\@ref{fig:01-01-reports}のデータに基づいたベイズ推論を実行してみよう．
+簡単のため，さらにメタ的な関数を実装しておく．
+また繰り返しの回数が多くなるので，２項分布を用いた形に書き直しておこう．
+
+
+```{r 01-06-def-bayse-inference-function}
+likelihood <- function(x, n, thetas){
+  res <- (thetas^{x}) * ((1-thetas)^{n-x})
+  return(res)
+}
+
+posterior <- function(x, n, prior, thetas){
+  lp = likelihood(x, n, thetas) * prior
+  return(lp / sum(lp)) # 尤度関数と事前分布の積をその和で割って正規化しておく
+}
+
+click_rate_inference <- function(click, imp, prior_type="uniform", len_n=1001){
+  thetas <- seq(0,1,length=len_n)
+  if(prior_type=="uniform"){
+    p <- rep(1/len_n, len_n)
+  }
+  p <- posterior(x=click, n=imp, prior=p, thetas=thetas)
+  results <- tibble(
+    thetas=thetas,
+    p=p
+  )
+  return(results)
+}
+```
+
+では，AliceとBobの二つのデザインについての結果を用いて推論を実行してみよう．
+
+```{r 01-06-exec-inference}
+reports <- list(
+   "Alice-A" = list(name="Alice", type="A", imp=40, click=2),
+   "Alice-B" = list(name="Alice", type="B", imp=50, click=4),
+   "Bob-A" = list(name="Bob", type="A", imp=1280, click=64),
+   "Bob-B" = list(name="Bob", type="B", imp=1600, click=128)
+)
+
+results <- lapply(reports, function(e){
+  res <- click_rate_inference(imp=e$imp, click=e$click)
+  res$name <- e$name
+  res$type <- e$type
+  return(res)
+}) %>% 
+  bind_rows()
+```
+
+AliceとBobそれぞれについて事後分布を可視化してみよう．
+
+```{r 01-06-show-results, fig.cap="AliceとBobのレポートのベイズ推論"}
+results %>% 
+  dplyr::filter(thetas < 0.3) %>%  # 0.3以上はほとんど0なので除く
+  ggplot(aes(x=thetas, y=p, group=type, color=type)) +
+  geom_line() +
+  facet_wrap(~name, scales = "free_y", nrow = 2)
+```
+
+単純な集計では，AliceとBobのレポートではクリック率がA,Bで同じだったが，今回の推論による事後分布を見ると，より多くのデータを獲得できたBobの結果の方がより確信度が高いことがわかる．Aliceの方は分布の裾が大きいため，クリック率についての確信度はBobよりも高くない．
+
+## 事後分布から決断を下す {#01-07-decision-making}
+
+ベイズ推論で得られた事後分布の特徴を数値化したり，事後分布からのサンプルを利用することで意思決定に有用な情報を得ることができる．
+
+### 要約統計量 {#01-07-01-statistics}
+
+::: {.definition name="期待値" #01-07-expected-value}
+連続・離散の確率分布に対して期待値をそれぞれ以下のように定義する．
+\begin{align}
+  E[x] = \begin{cases}
+    \int_{-\infty}^{\infty} xp(x) dx, & \text{continuous}
+    \sum{x} x p(x), & \text{discrete}
+  \end{cases}
+\end{align}
+:::
+
+::: {.definition name="分散" #01-07-variance}
+分散は次のように定義される．
+\begin{align}
+  V[x] = E[(x-E[x])^2]
+\end{align}
+また$\sqrt{V[x]}$を標準偏差と呼ぶ．
+::: 
+
+::: {.definition name="標本平均・標本分散" #01-07-sample-mean-var}
+確率分布から得られたサンプルに対して，その平均$\bar x$と分散$s^2$を次のように定義する．これらはそれぞれ標本平均・標本分散と呼ぶ．
+
+\begin{align}
+  \bar x &= \dfrac{1}{n}\sum_{i=1}^{n} x_i \\
+  s^2 &= \dfrac1n \sum_{i=1}^{n} (x_i - \bar x)^2
+\end{align}
+
+標本平均については，サンプルが独立で同一の分布に従う(independent identity distribution)とき，$n \rightarrow \infty$で分布の期待値に収束することが知られている（大数の法則）．
+これを
+\begin{align}
+  \bar x \longrightarrow E[x] \ (n \rightarrow \infty)
+\end{align}
+と表す．
+:::
+
+::: {.definition name="HDI:highest density interval" #01-07-hdi}
+連続型の確率分布に対して，以下のように定義される量をHDI(highest density interval)と呼ぶ．
+\begin{align}
+  \int_{p(x)>t} p(x) dx = \dfrac{\alpha}{100} 
+\end{align}
+ここで$t$は閾値でこの値よりも確率密度が高い区間で埋めていって$\alpha$に一致する点となる．
+HDIは確率変数の値が高い確率で現れる区間を表していて，例えば$\alpha = 0.95$のとき95%HDIと呼ばれ，確率$0.95$を占めるまでの確率密度が高いものから埋めて行った区域となる．
+
+確率分布が複数の山（ピーク）を持つ場合，HDIは複数の区域に分かれることがある．
+:::
+
+### HDIをつかった仮設検定 {#01-07-test-widh-hdi}
+本来連続型の確率分布に対して定義されているHDIだが，同様の考え方を用いで離散型の確率分布にも適用してみよう．
+ここでは，確率質量が多い確率変数の値を順に追加していく，という操作をする．
+
+```{r hid-for-discrete}
+hmv <- function(xs, ps, alpha=0.95){
+  df <- tibble(xs=xs, ps=ps) %>% 
+    dplyr::arrange(desc(ps)) %>% 
+    mutate(cumsum_ps = cumsum(ps))
+  hmv_range <- df %>% 
+    dplyr::filter(cumsum_ps <= alpha) %>% 
+    pull(xs) %>% 
+    range()
+  res <- list(
+    range=hmv_range,
+    x=df
+  )
+  return(res)
+}
+```
+
+```{r}
+# AliceのA案の結果についてhmvを計算する
+Alice_A <- results %>% 
+  dplyr::filter(
+    name == "Alice",
+    type == "A"
+  )
+hmv_Alice_a <- hmv(xs=Alice_A$thetas, ps=Alice_A$p)
+hmv_Alice_a$range
+```
+
+```{r}
+plots <- list()
+i <- 1
+for(tgt_name in c("Alice", "Bob")){
+  for(tgt_type in c("A", "B")){
+    df <- results %>% 
+      dplyr::filter(
+        name == tgt_name,
+        type == tgt_type
+      )
+    
+    fill_range <- hmv(xs=df$thetas, ps=df$p)$range
+    
+    bounds <- df %>% 
+      dplyr::filter(
+        thetas > fill_range[1],
+        thetas < fill_range[2]
+      )
+    plots[[i]] <- df %>% 
+      dplyr::filter(thetas < 0.3) %>% 
+      ggplot(aes(x=thetas, y=p)) + 
+      geom_line() +
+      geom_ribbon(data=bounds, aes(ymax=p), ymin=0, fill="orange", alpha=0.5)
+    i <- i+1
+  }
+}
+
+gridExtra::grid.arrange(
+  plots[[1]],plots[[2]],plots[[3]],plots[[4]],
+  nrow=4
+)
+```
+
 
