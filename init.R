@@ -41,6 +41,9 @@ if(! "index.Rmd" %in% list.files("book")){
 # def render function
 quick_render <- function(){
   bookdown::render_book("book", output_dir="../docs")
+  if(!file.exists("docs/.nojekyll")){
+    file.create("docs/.nojekyll")
+  }
 }
 
 message("- You can [quick_render()] function when working dir is root. ")
