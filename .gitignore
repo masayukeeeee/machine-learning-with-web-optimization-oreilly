@@ -4,3 +4,4 @@
 .Ruserdata
 _build.sh
 _deploy.sh
+.DS_Store
