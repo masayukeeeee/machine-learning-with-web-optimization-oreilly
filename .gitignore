@@ -2,3 +2,5 @@
 .Rhistory
 .RData
 .Ruserdata
+_build.sh
+_deploy.sh
