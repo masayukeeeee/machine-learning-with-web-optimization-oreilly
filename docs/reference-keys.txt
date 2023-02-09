@@ -14,6 +14,9 @@ fig:01-04-bernoulli-3d-plot
 fig:01-04-posterior-dist
 fig:01-05-show-how-move-posterior
 fig:01-06-show-results
+eq:01-06-02-generalized-bernoulli-multiplication
+eq:01-06-02-pdf-of-beta-dist
+fig:examples-of-beta
 def:01-07-expected-value
 def:01-07-variance
 def:01-07-sample-mean-var
@@ -29,6 +32,7 @@ id_01-03-additve-and-multiplication-theorem
 id_01-04-bayse-inference
 id_01-05-implementation-in-r
 id_01-06-bayse-inference-with-reports
+id_01-06-02-beta-distribution
 id_01-07-decision-making
 id_01-07-01-statistics
 id_01-07-test-widh-hdi

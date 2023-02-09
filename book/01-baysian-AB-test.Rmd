@@ -453,6 +453,89 @@ results %>%
 
 単純な集計では，AliceとBobのレポートではクリック率がA,Bで同じだったが，今回の推論による事後分布を見ると，より多くのデータを獲得できたBobの結果の方がより確信度が高いことがわかる．Aliceの方は分布の裾が大きいため，クリック率についての確信度はBobよりも高くない．
 
+## 別解:ベータ分布 {#01-06-02-beta-distribution}
+ベルヌーイ分布の尤度関数$\theta^r (1-\theta)^{1-r}$を繰り返し掛けていく操作は一般化すると
+
+\begin{align}
+  (\#eq:01-06-02-generalized-bernoulli-multiplication)
+  p(\theta | a,N) = \dfrac{\theta^{a} (1-\theta)^{N-a}}{\int_{0}^{1} \theta^{a}(1-\theta)^{N-a} d \theta}
+\end{align}
+
+と表せる．これはベータ分布と一致する．一般的にはベータ分布の確率密度関数は$\alpha >0, \beta > 0$をパラメータとして以下のように表される
+
+\begin{align}
+  (\#eq:01-06-02-pdf-of-beta-dist)
+  \text{Beta}(\alpha, \beta) = p(\theta | \alpha, \beta) = \dfrac{\theta^{\alpha - 1} (1-\theta)^{\beta - 1}}{\int_{0}^{1} \theta^{\alpha - 1}(1-\theta)^{\beta - 1} d \theta}
+\end{align}
+
+$\alpha, \beta$の値を変えた場合のベータ分布の形状をプロットしてみよう．
+
+```{r examples-of-beta, fig.cap="ベータ分布の形状"}
+thetas <- seq(0.001, 0.999,length=1000)
+params <- matrix(c(1,2,0.5,1,5,0.5), byrow=T, nrow=2)
+apply(params, 2, function(e){
+  dbeta(thetas, e[1], e[2])
+}) %>% 
+  as_tibble() %>% 
+  rename(
+    alpha_1_beta_1 = V1,
+    alpha_2_beta_5 = V2,
+    alpha_05_beta_05 = V3
+  ) %>% 
+  bind_cols(thetas=thetas) %>% 
+  pivot_longer(cols=c("alpha_1_beta_1","alpha_2_beta_5","alpha_05_beta_05"),
+               values_to = "dbeta",
+               names_to = "params") %>% 
+  dplyr::filter(dbeta < 3) %>% 
+  ggplot(aes(x=thetas, y=dbeta, group=params)) + 
+  geom_line(aes(color=params))
+```
+
+一般に事前分布と事後分布が同じ確率分布で表せるとは限らないが，ある尤度関数について，事後分布と事前分布が同じ種類の確率分布で表される特徴を持つ事前分布のことを**共役事前分布(conjugate prior)**と呼ぶ．
+
+この例では，事後分布が$\alpha = a + 1, \beta = N - a + 1$としたベータ分布として表される．
+
+```{r 01-06-02-beta-inference}
+thetas <- 
+
+beta_pdf <- function(alpha, beta, thetas){
+  numerator <- thetas ** (alpha - 1) * (1 - thetas) ** (beta - 1)
+  return(numerator / sum(numerator))
+}
+
+beta_posterior <- function(a, N, thetas){
+  return(beta_pdf(a + 1, N - a + 1, thetas))
+}
+
+reports <- list(
+   "Alice-A" = list(name="Alice", type="A", imp=40, click=2),
+   "Alice-B" = list(name="Alice", type="B", imp=50, click=4),
+   "Bob-A" = list(name="Bob", type="A", imp=1280, click=64),
+   "Bob-B" = list(name="Bob", type="B", imp=1600, click=128)
+)
+
+results <- lapply(reports, function(e){
+  thetas <- seq(0,1,length=1001)
+  p <- beta_posterior(e$click, e$imp, thetas)
+  res <- tibble(
+    thetas=thetas,
+    p=p
+  )
+  res$name <- e$name
+  res$type <- e$type
+  return(res)
+}) %>% 
+  bind_rows()
+
+results %>% 
+  dplyr::filter(thetas < 0.3) %>%  # 0.3以上はほとんど0なので除く
+  ggplot(aes(x=thetas, y=p, group=type, color=type)) +
+  geom_line() +
+  facet_wrap(~name, scales = "free_y", nrow = 2)
+```
+
+以上のように，ベータ分布の形で描き下しても変わらないことが確認できた．
+
 ## 事後分布から決断を下す {#01-07-decision-making}
 
 ベイズ推論で得られた事後分布の特徴を数値化したり，事後分布からのサンプルを利用することで意思決定に有用な情報を得ることができる．
@@ -569,4 +652,3 @@ gridExtra::grid.arrange(
 )
 ```
 
-テスト変更したぞ.nojekyllを作るだけ
