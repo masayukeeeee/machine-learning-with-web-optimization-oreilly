@@ -495,8 +495,8 @@ apply(params, 2, function(e){
 
 この例では，事後分布が$\alpha = a + 1, \beta = N - a + 1$としたベータ分布として表される．
 
-```{r 01-06-02-beta-inference}
-thetas <- 
+```{r 01-06-02-beta-inference, fig.cap="ベータ分布で表現した場合の推論結果"}
+thetas <- thetas <- seq(0.001, 0.999,length=1000)
 
 beta_pdf <- function(alpha, beta, thetas){
   numerator <- thetas ** (alpha - 1) * (1 - thetas) ** (beta - 1)
@@ -587,7 +587,7 @@ HDIは確率変数の値が高い確率で現れる区間を表していて，�
 確率分布が複数の山（ピーク）を持つ場合，HDIは複数の区域に分かれることがある．
 :::
 
-### HDIをつかった仮設検定 {#01-07-test-widh-hdi}
+### HDIをつかった仮設検定 {#01-07-test-with-hdi}
 本来連続型の確率分布に対して定義されているHDIだが，同様の考え方を用いで離散型の確率分布にも適用してみよう．
 ここでは，確率質量が多い確率変数の値を順に追加していく，という操作をする．
 
@@ -608,7 +608,7 @@ hmv <- function(xs, ps, alpha=0.95){
 }
 ```
 
-```{r}
+```{r calculate-hmv}
 # AliceのA案の結果についてhmvを計算する
 Alice_A <- results %>% 
   dplyr::filter(
@@ -619,9 +619,12 @@ hmv_Alice_a <- hmv(xs=Alice_A$thetas, ps=Alice_A$p)
 hmv_Alice_a$range
 ```
 
-```{r}
+```{r posterior-dist-with-hmv-range, fig.cap="事後分布とHDI", ref.label="posterior-dist-with-hmv-range"}
 plots <- list()
 i <- 1
+
+hdi_summary <- tibble()
+
 for(tgt_name in c("Alice", "Bob")){
   for(tgt_type in c("A", "B")){
     df <- results %>% 
@@ -631,6 +634,11 @@ for(tgt_name in c("Alice", "Bob")){
       )
     
     fill_range <- hmv(xs=df$thetas, ps=df$p)$range
+    hdi_summary <- bind_rows(
+      hdi_summary,
+      tibble(name=tgt_name, type=tgt_name, 
+             hid_min=fill_range[1], hdi_max=fill_range[2])
+    )
     
     bounds <- df %>% 
       dplyr::filter(
@@ -641,14 +649,121 @@ for(tgt_name in c("Alice", "Bob")){
       dplyr::filter(thetas < 0.3) %>% 
       ggplot(aes(x=thetas, y=p)) + 
       geom_line() +
-      geom_ribbon(data=bounds, aes(ymax=p), ymin=0, fill="orange", alpha=0.5)
+      geom_ribbon(data=bounds, aes(ymax=p), ymin=0, fill="orange", alpha=0.5) +
+      ggtitle(label=glue("{tgt_name} - {tgt_type}"), 
+              subtitle = glue("HDI: [{fill_range[1]}, {fill_range[2]}]"))
     i <- i+1
   }
 }
 
 gridExtra::grid.arrange(
-  plots[[1]],plots[[2]],plots[[3]],plots[[4]],
-  nrow=4
+  plots[[1]],plots[[3]],plots[[2]],plots[[4]],
+  nrow=2, ncol=2
 )
 ```
+図\@ref(fig:posterior-dist-with-hmv-range)をみると，Bobの方がHDIの範囲が小さいことがわかる．
+どちらもB案の方が事後分布が右によっているものの，Aliceの方はHDIの重なる領域が多く，Bobは重なっていない．
+ここから以下の仮説を検証してみよう．
 
+- 仮説：デザインB案のクリック率はよりも5%大きい．
+
+一般的には95%HDIを仮設検定に利用することが多い．ただしこの閾値は分析者によって決定されるものでありそれはチームで合意を取るべき数値である．
+
+さて，HDIのサマリである表\@ref(tab:hdi-summary-1)を見るとAlice-BのHDIは$[0.026, 0.175]$，Bob-Bは$[0.068, 0.093]$であり，5%が含まれているのはAlice-Bである．これより，Alice-Bについては仮説が成り立つとは言えず，Bob-Bは成り立っていると言えるだろう．
+
+```{r show-hid-summary}
+knitr::kable(hdi_summary, label = "hdi-summary-1", caption = "Alice，BobそれぞれのHDIの範囲") 
+```
+
+例えば，HDIが$[0.051,0.06]$のような値だった場合に今回の仮説を採択すべきかについては，難しい問題である．
+閾値を厳密なものとして運用するか，ある程度許容する幅を持たせるかも分析の設計次第であり，チームで合意しておく必要はある．
+例えば閾値を$[0.45, 0.55]$のように設定する場合，この区間を**ROPE(region of practical equivalence)**という．
+
+ROPEを利用する際の意思決定については以下のようなルールが考えられる．
+
+- $\text{ROPE} \not\subset \text{HDI}$は仮説を棄却
+- $\text{HDI} \subset \text{ROPE}$は仮説を採択
+- そのほかの場合は結論づけることを控える
+
+
+今度は以下のような仮説を考えてみよう．
+
+- 仮説：デザインB案はデザインA案よりも大きい
+
+これはHDIを利用する場合は以下のように運用することができる．
+
+- デザインB案の95%HDIがデザインA案のHDIが互いに素なとき，2つのクリックは異なる．
+  - $\forall a \in \text{HDI}_A, \forall b \in \text{HDI}_B \Rightarrow a < b$が成り立つ時，B案の値はA案よりも大きい
+  - $\forall a \in \text{HDI}_A, \forall b \in \text{HDI}_B \Rightarrow a > b$が成り立つ時，B案の値はA案よりも小さい
+- その他の場合は結論づけることを控える．
+
+この仮説ではAliceの場合はHDIの領域に被りがあるためクリック率の大小について結論づけることはできないとし，Bobの場合はB案の方が大きいと結論づけられる．
+
+## 新たな確率変数を導入する {#01-08-introduce-new-random-variable}
+事後分布を得た確率変数を変換して，新たな確率変数を得てその分布に着目することを考えよう．
+
+- 仮説：デザインB案のクリック率はデザインA案よりも大きい
+
+この仮説は$\delta > \theta_B - \theta_A$であり$\delta$が新たな確率変数となる．$\delta$の分布については，A,Bそれぞれの事後分布に基づいて乱数を発生させて$\delta$のサンプルを得ることで，標本から分布を推定することにする．
+
+それぞれの事後分布は，上記の議論の中で以下のパラメータを持つベータ分布で表せるので，ここからサンプルを生成すればよい．
+
+|Name|Type|$\alpha = a + 1$|$\beta = N - a + 1$|
+|:-|:-|-:|-:|
+|Alice|A|3|39|
+||B|5|47|
+|Bob|A|65|1,217|
+||B|129|1,473|
+
+```{r generate-sample-delta,  fig.cap="deltaの差のヒストグラム"}
+rdelta <- function(n, params) {
+  # params: list of parameters for 2 beta-distribution
+  # params <- list(A = list(alpha, beta), B = list(alpha, beta))
+  A <- rbeta(n=n, shape1=params$A$alpha, shape2=params$A$beta)
+  B <- rbeta(n=n, shape1=params$B$alpha, shape2=params$B$beta)
+  delta <- B - A
+  res <- tibble(A=A, B=B, delta=delta)
+  return(res)
+}
+
+Alice_params <- list(
+  A = list(alpha=3, beta=39),
+  B = list(alpha=5, beta=47)
+)
+
+Bob_params <- list(
+  A = list(alpha=65, beta=1217),
+  B = list(alpha=129, beta=1473)
+)
+
+set.seed(777)
+vis_data <- bind_rows(
+  rdelta(n=100000, params=Alice_params) %>% 
+    mutate(name="Alice"),
+  rdelta(n=100000, params=Bob_params) %>% 
+    mutate(name="Bob")
+)
+
+ggplot(vis_data, aes(delta)) +
+  geom_histogram(binwidth = 0.01) + 
+  facet_wrap(~name, scales = "free_y")
+```
+
+
+図 \@ref(fig:generate-sample-delta) はAlice，Bobそれぞれの事後分布から生成したサンプルもとにした$\delta$のヒストグラムである．
+この$\delta$のサンプルに対して以下のような仮説を立てて検証することができる．
+
+- 仮説：$\delta$が95%で正の値になる．
+
+具体的には，生成した$\delta$のサンプルが正の値になっている割合を計算すれば良い．
+
+```{r calc-prop-delta-is-gt-0}
+hypo_summary <- vis_data %>% 
+  mutate(hypo_test = delta > 0) %>% 
+  group_by(name) %>% 
+  summarise(n=n(), hypo=mean(hypo_test))
+
+knitr::kable(hypo_summary, label = "delta-hypo-summary", caption = "δ>0の割合")
+```
+
+表\@ref(tab:delta-hypo-summary)がAlice，Bobそれぞれの$\delta > 0$の割合である．これより，Aliceについては仮説を採択できず，Bobについては仮説が正しいと結論づける根拠にできると考えられる．

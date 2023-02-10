@@ -17,10 +17,15 @@ fig:01-06-show-results
 eq:01-06-02-generalized-bernoulli-multiplication
 eq:01-06-02-pdf-of-beta-dist
 fig:examples-of-beta
+fig:01-06-02-beta-inference
 def:01-07-expected-value
 def:01-07-variance
 def:01-07-sample-mean-var
 def:01-07-hdi
+fig:posterior-dist-with-hmv-range
+tab:hdi-summary-1
+fig:generate-sample-delta
+tab:delta-hypo-summary
 id_01-intro
 id_01-01-situation
 データ生成のプロセス
@@ -35,4 +40,5 @@ id_01-06-bayse-inference-with-reports
 id_01-06-02-beta-distribution
 id_01-07-decision-making
 id_01-07-01-statistics
-id_01-07-test-widh-hdi
+id_01-07-test-with-hdi
+id_01-08-introduce-new-random-variable

@@ -14,3 +14,12 @@ Goal : Rで実装してGithub pagesで公開する
 ```{r}
 bookdown::render_book("book", output_dir="../docs")
 ```
+
+## Tips
+
+GitHub Pagesでのjekyllのの影響を考慮して`.nojekyll`ファイルをroot/docs/配下に作成しておく.
+
+```{r}
+# assume that you are in the root of the repository
+file.create("docs/.nojekyll")
+```
