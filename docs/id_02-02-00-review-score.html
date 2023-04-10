@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>2.1 真のレビュースコア | ウェブ最適化ではじめる機械学習 in R</title>
+  <meta name="description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
+  <meta name="generator" content="bookdown 0.32 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="2.1 真のレビュースコア | ウェブ最適化ではじめる機械学習 in R" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
+  <meta name="github-repo" content="https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="2.1 真のレビュースコア | ウェブ最適化ではじめる機械学習 in R" />
+  
+  <meta name="twitter:description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
+  
+
+<meta name="author" content="Masayuki Sakai" />
+
+
+<meta name="date" content="2023-04-10" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="id_02-00-00-inference-with-rstan.html"/>
+<link rel="next" href="id_02-03-00-visit-time.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<script src="libs/plotly-binding-4.10.1/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">ウェブ最適化ではじめる機械学習 in R</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>概要</a></li>
+<li class="chapter" data-level="1" data-path="id_01-intro.html"><a href="id_01-intro.html"><i class="fa fa-check"></i><b>1</b> A/Bテストから始めよう：ベイズ統計による仮説検定入門</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="id_01-01-situation.html"><a href="id_01-01-situation.html"><i class="fa fa-check"></i><b>1.1</b> 状況設定</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="id_01-01-situation.html"><a href="id_01-01-situation.html#データ生成のプロセス"><i class="fa fa-check"></i><b>1.1.1</b> データ生成のプロセス</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="id_01-02-pdf-approximation.html"><a href="id_01-02-pdf-approximation.html"><i class="fa fa-check"></i><b>1.2</b> 離散化による確率密度関数の近似</a></li>
+<li class="chapter" data-level="1.3" data-path="id_01-03-additve-and-multiplication-theorem.html"><a href="id_01-03-additve-and-multiplication-theorem.html"><i class="fa fa-check"></i><b>1.3</b> 加法定理・乗法定理</a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="id_01-03-additve-and-multiplication-theorem.html"><a href="id_01-03-additve-and-multiplication-theorem.html#周辺化周辺分布"><i class="fa fa-check"></i><b>1.3.1</b> 周辺化・周辺分布</a></li>
+<li class="chapter" data-level="1.3.2" data-path="id_01-03-additve-and-multiplication-theorem.html"><a href="id_01-03-additve-and-multiplication-theorem.html#連続値の場合"><i class="fa fa-check"></i><b>1.3.2</b> 連続値の場合</a></li>
+<li class="chapter" data-level="1.3.3" data-path="id_01-03-additve-and-multiplication-theorem.html"><a href="id_01-03-additve-and-multiplication-theorem.html#ベイズの定理"><i class="fa fa-check"></i><b>1.3.3</b> ベイズの定理</a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="id_01-04-bayse-inference.html"><a href="id_01-04-bayse-inference.html"><i class="fa fa-check"></i><b>1.4</b> ベイズの定理を使ったクリック率の推論</a></li>
+<li class="chapter" data-level="1.5" data-path="id_01-05-implementation-in-r.html"><a href="id_01-05-implementation-in-r.html"><i class="fa fa-check"></i><b>1.5</b> Rでの実装</a></li>
+<li class="chapter" data-level="1.6" data-path="id_01-06-bayse-inference-with-reports.html"><a href="id_01-06-bayse-inference-with-reports.html"><i class="fa fa-check"></i><b>1.6</b> レポートデータを用いた推論</a></li>
+<li class="chapter" data-level="1.7" data-path="id_01-06-02-beta-distribution.html"><a href="id_01-06-02-beta-distribution.html"><i class="fa fa-check"></i><b>1.7</b> 別解:ベータ分布</a></li>
+<li class="chapter" data-level="1.8" data-path="id_01-07-decision-making.html"><a href="id_01-07-decision-making.html"><i class="fa fa-check"></i><b>1.8</b> 事後分布から決断を下す</a>
+<ul>
+<li class="chapter" data-level="1.8.1" data-path="id_01-07-decision-making.html"><a href="id_01-07-decision-making.html#id_01-07-01-statistics"><i class="fa fa-check"></i><b>1.8.1</b> 要約統計量</a></li>
+<li class="chapter" data-level="1.8.2" data-path="id_01-07-decision-making.html"><a href="id_01-07-decision-making.html#id_01-07-test-with-hdi"><i class="fa fa-check"></i><b>1.8.2</b> HDIをつかった仮設検定</a></li>
+</ul></li>
+<li class="chapter" data-level="1.9" data-path="id_01-08-introduce-new-random-variable.html"><a href="id_01-08-introduce-new-random-variable.html"><i class="fa fa-check"></i><b>1.9</b> 新たな確率変数を導入する</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="id_02-00-00-inference-with-rstan.html"><a href="id_02-00-00-inference-with-rstan.html"><i class="fa fa-check"></i><b>2</b> RStanを使った推論</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="id_02-02-00-review-score.html"><a href="id_02-02-00-review-score.html"><i class="fa fa-check"></i><b>2.1</b> 真のレビュースコア</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="id_02-02-00-review-score.html"><a href="id_02-02-00-review-score.html#ディリクレ分布による事前分布"><i class="fa fa-check"></i><b>2.1.1</b> ディリクレ分布による事前分布</a></li>
+<li class="chapter" data-level="2.1.2" data-path="id_02-02-00-review-score.html"><a href="id_02-02-00-review-score.html#推論の実行"><i class="fa fa-check"></i><b>2.1.2</b> 推論の実行</a></li>
+<li class="chapter" data-level="2.1.3" data-path="id_02-02-00-review-score.html"><a href="id_02-02-00-review-score.html#item-bについての推論"><i class="fa fa-check"></i><b>2.1.3</b> Item Bについての推論</a></li>
+<li class="chapter" data-level="2.1.4" data-path="id_02-02-00-review-score.html"><a href="id_02-02-00-review-score.html#推定結果の比較"><i class="fa fa-check"></i><b>2.1.4</b> 推定結果の比較</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="id_02-03-00-visit-time.html"><a href="id_02-03-00-visit-time.html"><i class="fa fa-check"></i><b>2.2</b> 滞在時間をテストする</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="id_99_references.html"><a href="id_99_references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io" target="blank">GitHub repository</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">ウェブ最適化ではじめる機械学習 in R</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="id_02-02-00-review-score" class="section level2 hasAnchor" number="2.1">
+<h2><span class="header-section-number">2.1</span> 真のレビュースコア<a href="id_02-02-00-review-score.html#id_02-02-00-review-score" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>レビューのスコアについてベイス推定を行う．ここでは次のTable <a href="id_02-02-00-review-score.html#tab:data-review-score">2.1</a> のデータが得られているとして進めていく．</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="id_02-02-00-review-score.html#cb26-1" aria-hidden="true" tabindex="-1"></a>review_score <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb26-2"><a href="id_02-02-00-review-score.html#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">item =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">&#39;A&#39;</span>, <span class="st">&#39;B&#39;</span>), <span class="at">each =</span> <span class="dv">5</span>),</span>
+<span id="cb26-3"><a href="id_02-02-00-review-score.html#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">score =</span> base<span class="sc">::</span><span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">times =</span> <span class="dv">2</span>),</span>
+<span id="cb26-4"><a href="id_02-02-00-review-score.html#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">count =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">10</span>, <span class="dv">36</span>, <span class="dv">91</span>, <span class="dv">170</span>,</span>
+<span id="cb26-5"><a href="id_02-02-00-review-score.html#cb26-5" aria-hidden="true" tabindex="-1"></a>            <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">4</span>, <span class="dv">0</span>, <span class="dv">6</span>)</span>
+<span id="cb26-6"><a href="id_02-02-00-review-score.html#cb26-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-7"><a href="id_02-02-00-review-score.html#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-8"><a href="id_02-02-00-review-score.html#cb26-8" aria-hidden="true" tabindex="-1"></a>review_score <span class="sc">%&gt;%</span> </span>
+<span id="cb26-9"><a href="id_02-02-00-review-score.html#cb26-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> <span class="st">&quot;score&quot;</span>, <span class="at">values_from =</span> <span class="st">&quot;count&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-10"><a href="id_02-02-00-review-score.html#cb26-10" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">&quot;仮想のレビュースコアのデータ&quot;</span>,</span>
+<span id="cb26-11"><a href="id_02-02-00-review-score.html#cb26-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">label =</span> <span class="st">&quot;data-review-score&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-12"><a href="id_02-02-00-review-score.html#cb26-12" aria-hidden="true" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:data-review-score">Table 2.1: </span>仮想のレビュースコアのデータ
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+item
+</th>
+<th style="text-align:right;">
+1
+</th>
+<th style="text-align:right;">
+2
+</th>
+<th style="text-align:right;">
+3
+</th>
+<th style="text-align:right;">
+4
+</th>
+<th style="text-align:right;">
+5
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+36
+</td>
+<td style="text-align:right;">
+91
+</td>
+<td style="text-align:right;">
+170
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+6
+</td>
+</tr>
+</tbody>
+</table>
+<p>これらのレビューについて回答数と平均点を計算するとTable <a href="id_02-02-00-review-score.html#tab:summary-of-review-score">2.2</a> のようになる．</p>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:summary-of-review-score">Table 2.2: </span>レビュースコアのアイテムごとの回答人数と平均
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+item
+</th>
+<th style="text-align:right;">
+total_count
+</th>
+<th style="text-align:right;">
+mean
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:right;">
+327
+</td>
+<td style="text-align:right;">
+4.165138
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+4.200000
+</td>
+</tr>
+</tbody>
+</table>
+<p>平均点を見るとどちらも同じ位でかつBの方が若干高い．しかし回答数をみるとAの方が信頼できそうに思える．</p>
+<p>このデータについては複数の値を取るカテゴリデータと見做してモデルを式 <a href="id_02-02-00-review-score.html#eq:review-score-model">(2.1)</a> のように考えよう．</p>
+<p><span class="math display" id="eq:review-score-model">\[\begin{align}
+\begin{aligned}
+  \boldsymbol\theta &amp;\sim \text{Dirichlet}(\boldsymbol\alpha) \\
+  \boldsymbol r &amp;\sim \text{Categorical}(\boldsymbol\theta)
+\end{aligned}
+\tag{2.1}
+\end{align}\]</span></p>
+<p>ディリクレ分布は<span class="math inline">\(K\)</span>次元で，要素が<span class="math inline">\([0,1]\)</span>の値を取り，その総和が<span class="math inline">\(1\)</span>となるような確率変数ベクトルが従う確率分布である．ディリクレ分布自体はパラメータとして<span class="math inline">\(K\)</span>次元ベクトル<span class="math inline">\(\boldsymbol \alpha\)</span>を取る．</p>
+<div id="ディリクレ分布による事前分布" class="section level3 hasAnchor" number="2.1.1">
+<h3><span class="header-section-number">2.1.1</span> ディリクレ分布による事前分布<a href="id_02-02-00-review-score.html#ディリクレ分布による事前分布" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>ここで事前分布には簡単のため以下の式 <a href="id_02-02-00-review-score.html#eq:review-score-model-posterior">(2.2)</a> を採用しよう．</p>
+<p><span class="math display" id="eq:review-score-model-posterior">\[\begin{align}
+\begin{aligned}
+  \boldsymbol\theta &amp;\sim \text{Dirichlet}(\boldsymbol\alpha = (1,1,1,1,1)) \\
+  \boldsymbol r &amp;\sim \text{Categorical}(\boldsymbol\theta)
+\end{aligned}
+\tag{2.2}
+\end{align}\]</span></p>
+</div>
+<div id="推論の実行" class="section level3 hasAnchor" number="2.1.2">
+<h3><span class="header-section-number">2.1.2</span> 推論の実行<a href="id_02-02-00-review-score.html#推論の実行" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>RStanでこのモデルについてMCMCを行い事後分布を推定する．stanのコードは次のようになる．</p>
+<pre><code>data {
+  int n;
+  int&lt;lower=1&gt; n_category;
+  int&lt;lower=0&gt; counts[n];
+  vector&lt;lower=0&gt;[n_category] alpha;
+}
+
+parameters {
+  simplex[n_category] theta;
+}
+
+model {
+  theta ~ dirichlet(alpha);
+  counts ~ multinomial(theta);  
+}
+</code></pre>
+<p>このstanコードを実行して結果を得よう．</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="id_02-02-00-review-score.html#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># item A について多項分布・ディリクレ分布によるベイズ推論を行う</span></span>
+<span id="cb28-2"><a href="id_02-02-00-review-score.html#cb28-2" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> </span>
+<span id="cb28-3"><a href="id_02-02-00-review-score.html#cb28-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(item <span class="sc">==</span> <span class="st">&quot;A&quot;</span>)</span>
+<span id="cb28-4"><a href="id_02-02-00-review-score.html#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-5"><a href="id_02-02-00-review-score.html#cb28-5" aria-hidden="true" tabindex="-1"></a>n_category <span class="ot">&lt;-</span> <span class="dv">5</span> <span class="co"># カテゴリ数</span></span>
+<span id="cb28-6"><a href="id_02-02-00-review-score.html#cb28-6" aria-hidden="true" tabindex="-1"></a>counts <span class="ot">&lt;-</span> df<span class="sc">$</span>count <span class="co"># レビュースコアのカウント</span></span>
+<span id="cb28-7"><a href="id_02-02-00-review-score.html#cb28-7" aria-hidden="true" tabindex="-1"></a>alphas <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>) <span class="co"># ディリクレ分布のパラメーター</span></span>
+<span id="cb28-8"><a href="id_02-02-00-review-score.html#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-9"><a href="id_02-02-00-review-score.html#cb28-9" aria-hidden="true" tabindex="-1"></a>review_data <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb28-10"><a href="id_02-02-00-review-score.html#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_category =</span> n_category,</span>
+<span id="cb28-11"><a href="id_02-02-00-review-score.html#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">counts =</span> counts,</span>
+<span id="cb28-12"><a href="id_02-02-00-review-score.html#cb28-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">alpha =</span> alpha</span>
+<span id="cb28-13"><a href="id_02-02-00-review-score.html#cb28-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-14"><a href="id_02-02-00-review-score.html#cb28-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-15"><a href="id_02-02-00-review-score.html#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="co"># stanの実行</span></span>
+<span id="cb28-16"><a href="id_02-02-00-review-score.html#cb28-16" aria-hidden="true" tabindex="-1"></a>model_path <span class="ot">&lt;-</span> <span class="st">&quot;[path to the stan file]&quot;</span></span>
+<span id="cb28-17"><a href="id_02-02-00-review-score.html#cb28-17" aria-hidden="true" tabindex="-1"></a>seed <span class="ot">=</span> <span class="dv">1234</span></span>
+<span id="cb28-18"><a href="id_02-02-00-review-score.html#cb28-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-19"><a href="id_02-02-00-review-score.html#cb28-19" aria-hidden="true" tabindex="-1"></a>fit_item_a <span class="ot">&lt;-</span> rstan<span class="sc">::</span><span class="fu">stan</span>(</span>
+<span id="cb28-20"><a href="id_02-02-00-review-score.html#cb28-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> model_path,</span>
+<span id="cb28-21"><a href="id_02-02-00-review-score.html#cb28-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> review_data,</span>
+<span id="cb28-22"><a href="id_02-02-00-review-score.html#cb28-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> seed,</span>
+<span id="cb28-23"><a href="id_02-02-00-review-score.html#cb28-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">4000</span>,</span>
+<span id="cb28-24"><a href="id_02-02-00-review-score.html#cb28-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">chain =</span> <span class="dv">4</span>,</span>
+<span id="cb28-25"><a href="id_02-02-00-review-score.html#cb28-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">list</span>(</span>
+<span id="cb28-26"><a href="id_02-02-00-review-score.html#cb28-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_treedepth =</span> <span class="dv">15</span></span>
+<span id="cb28-27"><a href="id_02-02-00-review-score.html#cb28-27" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb28-28"><a href="id_02-02-00-review-score.html#cb28-28" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>推定結果は <a href="id_02-02-00-review-score.html#tab:stan-result-item-a">2.3</a> のようになった．</p>
+<table>
+<caption>
+<span id="tab:stan-result-item-a">Table 2.3: </span>Item Aのレビューに対するベイズ推論の結果
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+mean
+</th>
+<th style="text-align:right;">
+se_mean
+</th>
+<th style="text-align:right;">
+sd
+</th>
+<th style="text-align:right;">
+2.5%
+</th>
+<th style="text-align:right;">
+50%
+</th>
+<th style="text-align:right;">
+97.5%
+</th>
+<th style="text-align:right;">
+Rhat
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+0.063
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.013
+</td>
+<td style="text-align:right;">
+0.040
+</td>
+<td style="text-align:right;">
+0.062
+</td>
+<td style="text-align:right;">
+0.093
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0.033
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.010
+</td>
+<td style="text-align:right;">
+0.017
+</td>
+<td style="text-align:right;">
+0.032
+</td>
+<td style="text-align:right;">
+0.055
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0.111
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.017
+</td>
+<td style="text-align:right;">
+0.080
+</td>
+<td style="text-align:right;">
+0.111
+</td>
+<td style="text-align:right;">
+0.147
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0.277
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.024
+</td>
+<td style="text-align:right;">
+0.230
+</td>
+<td style="text-align:right;">
+0.277
+</td>
+<td style="text-align:right;">
+0.326
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0.515
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.028
+</td>
+<td style="text-align:right;">
+0.460
+</td>
+<td style="text-align:right;">
+0.515
+</td>
+<td style="text-align:right;">
+0.569
+</td>
+<td style="text-align:right;">
+1.001
+</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="id_02-02-00-review-score.html#cb29-1" aria-hidden="true" tabindex="-1"></a>ms_a <span class="ot">&lt;-</span> rstan<span class="sc">::</span><span class="fu">extract</span>(fit_item_a)</span>
+<span id="cb29-2"><a href="id_02-02-00-review-score.html#cb29-2" aria-hidden="true" tabindex="-1"></a>ms_a<span class="sc">$</span>theta <span class="sc">%&gt;%</span> </span>
+<span id="cb29-3"><a href="id_02-02-00-review-score.html#cb29-3" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">as_tibble</span>(<span class="at">.name_repair =</span> <span class="st">&quot;unique&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-4"><a href="id_02-02-00-review-score.html#cb29-4" aria-hidden="true" tabindex="-1"></a>  magrittr<span class="sc">::</span><span class="fu">set_colnames</span>(<span class="fu">paste</span>(<span class="st">&quot;theta&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">sep=</span><span class="st">&quot;_&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-5"><a href="id_02-02-00-review-score.html#cb29-5" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">everything</span>(),</span>
+<span id="cb29-6"><a href="id_02-02-00-review-score.html#cb29-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&quot;theta&quot;</span>,</span>
+<span id="cb29-7"><a href="id_02-02-00-review-score.html#cb29-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">&quot;sample&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-8"><a href="id_02-02-00-review-score.html#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb29-9"><a href="id_02-02-00-review-score.html#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">x =</span> sample), <span class="at">fill =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span> </span>
+<span id="cb29-10"><a href="id_02-02-00-review-score.html#cb29-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>theta)</span></code></pre></div>
+<div class="figure"><span style="display:block;" id="fig:density-of-stan-result-item-a"></span>
+<img src="_main_files/figure-html/density-of-stan-result-item-a-1.png" alt="Item Aにおける多項分布のパラメータの事後分布" width="672" />
+<p class="caption">
+Figure 2.1: Item Aにおける多項分布のパラメータの事後分布
+</p>
+</div>
+<p>いまレビューの平均スコアを式 <a href="id_02-02-00-review-score.html#eq:average-review-score">(2.3)</a> のように定義すると</p>
+<p><span class="math display" id="eq:average-review-score">\[\begin{align}
+m = 1 \theta_1 + 2 \theta_2 + 3 \theta_3 + 4 \theta_4 + 5 \theta_5
+\tag{2.3}
+\end{align}\]</span></p>
+<p>この確率変数に対してMCMCのサンプルを用いて事後分布を求めることができる．</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="id_02-02-00-review-score.html#cb30-1" aria-hidden="true" tabindex="-1"></a>posterior_avg <span class="ot">&lt;-</span> ms_a<span class="sc">$</span>theta <span class="sc">%*%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span> </span>
+<span id="cb30-2"><a href="id_02-02-00-review-score.html#cb30-2" aria-hidden="true" tabindex="-1"></a>above4_a <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(posterior_avg <span class="sc">&gt;</span> <span class="dv">4</span>), <span class="dv">3</span>)</span>
+<span id="cb30-3"><a href="id_02-02-00-review-score.html#cb30-3" aria-hidden="true" tabindex="-1"></a>subtitle <span class="ot">&lt;-</span> glue<span class="sc">::</span><span class="fu">glue</span>(<span class="st">&quot;proportion of &gt; 4 = {above4_a}&quot;</span>)</span>
+<span id="cb30-4"><a href="id_02-02-00-review-score.html#cb30-4" aria-hidden="true" tabindex="-1"></a>posterior_avg <span class="sc">%&gt;%</span> </span>
+<span id="cb30-5"><a href="id_02-02-00-review-score.html#cb30-5" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb30-6"><a href="id_02-02-00-review-score.html#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb30-7"><a href="id_02-02-00-review-score.html#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">x =</span> V1), <span class="at">fill =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span> </span>
+<span id="cb30-8"><a href="id_02-02-00-review-score.html#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="dv">0</span>, <span class="dv">5</span>) <span class="sc">+</span> </span>
+<span id="cb30-9"><a href="id_02-02-00-review-score.html#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="at">label =</span> <span class="st">&quot;Posterior distribution of Average: Item A&quot;</span>, <span class="at">subtitle =</span> subtitle) <span class="ot">-&gt;</span> pa_avg</span>
+<span id="cb30-10"><a href="id_02-02-00-review-score.html#cb30-10" aria-hidden="true" tabindex="-1"></a>pa_avg</span></code></pre></div>
+<div class="figure"><span style="display:block;" id="fig:posterior-avg-score-item-a"></span>
+<img src="_main_files/figure-html/posterior-avg-score-item-a-1.png" alt="Item Aの平均レビュースコアの事後分布" width="672" />
+<p class="caption">
+Figure 2.2: Item Aの平均レビュースコアの事後分布
+</p>
+</div>
+<p>この事後分布に対して，例えば平均のスコアが4以上になる割合は0.99と非常に高く，少なくとも4以上であることは信頼できそうである．</p>
+</div>
+<div id="item-bについての推論" class="section level3 hasAnchor" number="2.1.3">
+<h3><span class="header-section-number">2.1.3</span> Item Bについての推論<a href="id_02-02-00-review-score.html#item-bについての推論" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>全く同様の手続きで，Item Bについても推論を行なってみよう．
+モデルは同じなので渡すデータだけ変更すれば良い．</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="id_02-02-00-review-score.html#cb31-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> review_score <span class="sc">%&gt;%</span> </span>
+<span id="cb31-2"><a href="id_02-02-00-review-score.html#cb31-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(item <span class="sc">==</span> <span class="st">&quot;B&quot;</span>)</span>
+<span id="cb31-3"><a href="id_02-02-00-review-score.html#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="id_02-02-00-review-score.html#cb31-4" aria-hidden="true" tabindex="-1"></a>data_item_b <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb31-5"><a href="id_02-02-00-review-score.html#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_category =</span> <span class="dv">5</span>,</span>
+<span id="cb31-6"><a href="id_02-02-00-review-score.html#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">counts =</span> df<span class="sc">$</span>count,</span>
+<span id="cb31-7"><a href="id_02-02-00-review-score.html#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">alpha =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>) <span class="co"># 事前分布のパラメーター</span></span>
+<span id="cb31-8"><a href="id_02-02-00-review-score.html#cb31-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb31-9"><a href="id_02-02-00-review-score.html#cb31-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-10"><a href="id_02-02-00-review-score.html#cb31-10" aria-hidden="true" tabindex="-1"></a>fit_item_b <span class="ot">&lt;-</span> rstan<span class="sc">::</span><span class="fu">stan</span>(</span>
+<span id="cb31-11"><a href="id_02-02-00-review-score.html#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;book/script/chapter02/stan/review-score-01.stan&quot;</span>,</span>
+<span id="cb31-12"><a href="id_02-02-00-review-score.html#cb31-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_item_b,</span>
+<span id="cb31-13"><a href="id_02-02-00-review-score.html#cb31-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">1234</span>,</span>
+<span id="cb31-14"><a href="id_02-02-00-review-score.html#cb31-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">4000</span>,</span>
+<span id="cb31-15"><a href="id_02-02-00-review-score.html#cb31-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">chain =</span> <span class="dv">4</span>,</span>
+<span id="cb31-16"><a href="id_02-02-00-review-score.html#cb31-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">list</span>(<span class="at">max_treedepth =</span> <span class="dv">15</span>)</span>
+<span id="cb31-17"><a href="id_02-02-00-review-score.html#cb31-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Item Aと同様に推論の結果と事後分布を可視化しておく．</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="id_02-02-00-review-score.html#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_item_b)<span class="sc">$</span>summary <span class="sc">%&gt;%</span> </span>
+<span id="cb32-2"><a href="id_02-02-00-review-score.html#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb32-3"><a href="id_02-02-00-review-score.html#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb32-4"><a href="id_02-02-00-review-score.html#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb32-5"><a href="id_02-02-00-review-score.html#cb32-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(rowname <span class="sc">!=</span> <span class="st">&quot;lp__&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-6"><a href="id_02-02-00-review-score.html#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(mean, se_mean, sd, <span class="st">`</span><span class="at">2.5%</span><span class="st">`</span>, <span class="st">`</span><span class="at">50%</span><span class="st">`</span>, <span class="st">`</span><span class="at">97.5%</span><span class="st">`</span>, Rhat) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-7"><a href="id_02-02-00-review-score.html#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">round</span>(<span class="dv">3</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-8"><a href="id_02-02-00-review-score.html#cb32-8" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">&quot;Item Bのレビューに対するベイズ推論の結果&quot;</span>,</span>
+<span id="cb32-9"><a href="id_02-02-00-review-score.html#cb32-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">label =</span> <span class="st">&quot;stan-result-item-b&quot;</span>)</span></code></pre></div>
+<table>
+<caption>
+<span id="tab:stan-result-item-b">Table 2.4: </span>Item Bのレビューに対するベイズ推論の結果
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+mean
+</th>
+<th style="text-align:right;">
+se_mean
+</th>
+<th style="text-align:right;">
+sd
+</th>
+<th style="text-align:right;">
+2.5%
+</th>
+<th style="text-align:right;">
+50%
+</th>
+<th style="text-align:right;">
+97.5%
+</th>
+<th style="text-align:right;">
+Rhat
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+0.067
+</td>
+<td style="text-align:right;">
+0.001
+</td>
+<td style="text-align:right;">
+0.064
+</td>
+<td style="text-align:right;">
+0.002
+</td>
+<td style="text-align:right;">
+0.048
+</td>
+<td style="text-align:right;">
+0.240
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0.067
+</td>
+<td style="text-align:right;">
+0.001
+</td>
+<td style="text-align:right;">
+0.063
+</td>
+<td style="text-align:right;">
+0.002
+</td>
+<td style="text-align:right;">
+0.048
+</td>
+<td style="text-align:right;">
+0.238
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0.334
+</td>
+<td style="text-align:right;">
+0.001
+</td>
+<td style="text-align:right;">
+0.117
+</td>
+<td style="text-align:right;">
+0.133
+</td>
+<td style="text-align:right;">
+0.325
+</td>
+<td style="text-align:right;">
+0.581
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0.066
+</td>
+<td style="text-align:right;">
+0.001
+</td>
+<td style="text-align:right;">
+0.062
+</td>
+<td style="text-align:right;">
+0.002
+</td>
+<td style="text-align:right;">
+0.048
+</td>
+<td style="text-align:right;">
+0.228
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0.465
+</td>
+<td style="text-align:right;">
+0.001
+</td>
+<td style="text-align:right;">
+0.123
+</td>
+<td style="text-align:right;">
+0.232
+</td>
+<td style="text-align:right;">
+0.464
+</td>
+<td style="text-align:right;">
+0.705
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="id_02-02-00-review-score.html#cb33-1" aria-hidden="true" tabindex="-1"></a>ms_b <span class="ot">&lt;-</span> rstan<span class="sc">::</span><span class="fu">extract</span>(fit_item_b)</span>
+<span id="cb33-2"><a href="id_02-02-00-review-score.html#cb33-2" aria-hidden="true" tabindex="-1"></a>ms_b<span class="sc">$</span>theta <span class="sc">%&gt;%</span> </span>
+<span id="cb33-3"><a href="id_02-02-00-review-score.html#cb33-3" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">as_tibble</span>(<span class="at">.name_repair =</span> <span class="st">&quot;unique&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-4"><a href="id_02-02-00-review-score.html#cb33-4" aria-hidden="true" tabindex="-1"></a>  magrittr<span class="sc">::</span><span class="fu">set_colnames</span>(<span class="fu">paste</span>(<span class="st">&quot;theta&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">sep=</span><span class="st">&quot;_&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-5"><a href="id_02-02-00-review-score.html#cb33-5" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">everything</span>(),</span>
+<span id="cb33-6"><a href="id_02-02-00-review-score.html#cb33-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&quot;theta&quot;</span>,</span>
+<span id="cb33-7"><a href="id_02-02-00-review-score.html#cb33-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">&quot;sample&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-8"><a href="id_02-02-00-review-score.html#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb33-9"><a href="id_02-02-00-review-score.html#cb33-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">x =</span> sample), <span class="at">fill =</span> <span class="st">&quot;orange&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span> </span>
+<span id="cb33-10"><a href="id_02-02-00-review-score.html#cb33-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>theta)</span></code></pre></div>
+<div class="figure"><span style="display:block;" id="fig:density-of-stan-result-item-b"></span>
+<img src="_main_files/figure-html/density-of-stan-result-item-b-1.png" alt="Item Bにおける多項分布のパラメータの事後分布" width="672" />
+<p class="caption">
+Figure 2.3: Item Bにおける多項分布のパラメータの事後分布
+</p>
+</div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="id_02-02-00-review-score.html#cb34-1" aria-hidden="true" tabindex="-1"></a>posterior_avg <span class="ot">&lt;-</span> ms_b<span class="sc">$</span>theta <span class="sc">%*%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span> </span>
+<span id="cb34-2"><a href="id_02-02-00-review-score.html#cb34-2" aria-hidden="true" tabindex="-1"></a>above4_a <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(posterior_avg <span class="sc">&gt;</span> <span class="dv">4</span>), <span class="dv">3</span>)</span>
+<span id="cb34-3"><a href="id_02-02-00-review-score.html#cb34-3" aria-hidden="true" tabindex="-1"></a>subtitle <span class="ot">&lt;-</span> glue<span class="sc">::</span><span class="fu">glue</span>(<span class="st">&quot;proportion of &gt; 4 = {above4_a}&quot;</span>)</span>
+<span id="cb34-4"><a href="id_02-02-00-review-score.html#cb34-4" aria-hidden="true" tabindex="-1"></a>posterior_avg <span class="sc">%&gt;%</span> </span>
+<span id="cb34-5"><a href="id_02-02-00-review-score.html#cb34-5" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb34-6"><a href="id_02-02-00-review-score.html#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb34-7"><a href="id_02-02-00-review-score.html#cb34-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">x =</span> V1), <span class="at">fill =</span> <span class="st">&quot;orange&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span> </span>
+<span id="cb34-8"><a href="id_02-02-00-review-score.html#cb34-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="dv">0</span>, <span class="dv">5</span>) <span class="sc">+</span> </span>
+<span id="cb34-9"><a href="id_02-02-00-review-score.html#cb34-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="at">label =</span> <span class="st">&quot;Posterior distribution of Average: Item B&quot;</span>, <span class="at">subtitle =</span> subtitle) <span class="ot">-&gt;</span> pb_avg</span>
+<span id="cb34-10"><a href="id_02-02-00-review-score.html#cb34-10" aria-hidden="true" tabindex="-1"></a>pb_avg</span></code></pre></div>
+<div class="figure"><span style="display:block;" id="fig:posterior-avg-score-item-b"></span>
+<img src="_main_files/figure-html/posterior-avg-score-item-b-1.png" alt="Item Bの平均レビュースコアの事後分布" width="672" />
+<p class="caption">
+Figure 2.4: Item Bの平均レビュースコアの事後分布
+</p>
+</div>
+<p>これらを確認すると，Item Bの方はItem Aに比べて事後分布の形状がやや広いことがわかる．
+これは回答数が少ないため信頼区間が広くとられていると解釈できる．</p>
+</div>
+<div id="推定結果の比較" class="section level3 hasAnchor" number="2.1.4">
+<h3><span class="header-section-number">2.1.4</span> 推定結果の比較<a href="id_02-02-00-review-score.html#推定結果の比較" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>最後にItem AとItem Bについて比較をまとめておこう．
+Fig <a href="#comparing-avg-review-score"><strong>??</strong></a> は既に示した図を縦に並べたものだが
+この比較で平均レビュースコアがどの程度信頼できるものかを確認できる．
+量的に表す場合，例えば事後分布のサンプルが4以上であるものの割合を計算すれば
+ある意味で平均のスコアが4以上になる確率を推論することができる．</p>
+<p>その意味ではItem Aでは事後分布上で4以上となるものは0.987であり少なくとも4以上であるという
+ことはかなり信頼を持って言えそうだ．</p>
+<p>一方Item Bでは0.268でありこの商品の平均レビュースコアが少なくとも4以上であるということの
+信頼性は低いと思える．</p>
+<div class="figure"><span style="display:block;" id="fig:comparing-avg-review-score"></span>
+<img src="_main_files/figure-html/comparing-avg-review-score-1.png" alt="平均レビュースコアの事後分布の比較" width="672" />
+<p class="caption">
+Figure 2.5: 平均レビュースコアの事後分布の比較
+</p>
+</div>
+<p>次に，Fig @ref(fig:spread_draws-of-items) はthetaの事後分布を比較した図である．
+Item Aの場合，thetaの事後分布の幅が比較的狭くなっておりレビューにおけるそれぞれのスコアで
+評価される確率のブレが少ない一方，Item Bの場合は幅が広くブレが大きいことがわかる．
+特に3と5は広く出ており現時点での平均スコアが4.2という値の信頼性が低いと見做せる．</p>
+<div class="figure">
+<img src="_main_files/figure-html/spread_draws-of-items-1.png" alt="thetaの事後分布の比較" width="672" />
+<p class="caption">
+(#fig:spread_draws-of-items)thetaの事後分布の比較
+</p>
+</div>
+<p>最後にTable <a href="id_02-02-00-review-score.html#tab:comparing-hid-of-theta-between-items">2.5</a> はthetaの事後分布におけるHDIを比較した表である．
+HDIの値を確認することでも，事後分布がどれほどの幅を持っているのかを見ることができる．</p>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:comparing-hid-of-theta-between-items">Table 2.5: </span>Itemごとのthetaの事後分布における95%HDI
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+theta
+</th>
+<th style="text-align:left;">
+Item A
+</th>
+<th style="text-align:left;">
+Item B
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+[0.038 - 0.09] (0.052)
+</td>
+<td style="text-align:left;">
+[0 - 0.193] (0.193)
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+[0.015 - 0.053] (0.038)
+</td>
+<td style="text-align:left;">
+[0 - 0.194] (0.194)
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+[0.08 - 0.146] (0.066)
+</td>
+<td style="text-align:left;">
+[0.118 - 0.557] (0.439)
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+[0.228 - 0.323] (0.095)
+</td>
+<td style="text-align:left;">
+[0 - 0.191] (0.191)
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+[0.462 - 0.57] (0.108)
+</td>
+<td style="text-align:left;">
+[0.229 - 0.7] (0.471)
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="id_02-00-00-inference-with-rstan.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="id_02-03-00-visit-time.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": [["docs/webops-and-ml-in-r.pdf", "PDF"]],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+},
+"info": false
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>1 A/Bテストから始めよう：ベイズ統計による仮説検定入門 | ウェブ最適化ではじめる機械学習 in R</title>
+  <title>2.2 滞在時間をテストする | ウェブ最適化ではじめる機械学習 in R</title>
   <meta name="description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
   <meta name="generator" content="bookdown 0.32 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="1 A/Bテストから始めよう：ベイズ統計による仮説検定入門 | ウェブ最適化ではじめる機械学習 in R" />
+  <meta property="og:title" content="2.2 滞在時間をテストする | ウェブ最適化ではじめる機械学習 in R" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
   <meta name="github-repo" content="https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="1 A/Bテストから始めよう：ベイズ統計による仮説検定入門 | ウェブ最適化ではじめる機械学習 in R" />
+  <meta name="twitter:title" content="2.2 滞在時間をテストする | ウェブ最適化ではじめる機械学習 in R" />
   
   <meta name="twitter:description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="index.html"/>
-<link rel="next" href="id_01-01-situation.html"/>
+<link rel="prev" href="id_02-02-00-review-score.html"/>
+<link rel="next" href="id_99_references.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -224,22 +224,105 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="id_01-intro" class="section level1 hasAnchor" number="1">
-<h1><span class="header-section-number">1</span> A/Bテストから始めよう：ベイズ統計による仮説検定入門<a href="id_01-intro.html#id_01-intro" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="id_02-03-00-visit-time" class="section level2 hasAnchor" number="2.2">
+<h2><span class="header-section-number">2.2</span> 滞在時間をテストする<a href="id_02-03-00-visit-time.html#id_02-03-00-visit-time" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>ここでは連続値の指標に対して仮設検定をしたい場合を扱っていく．例えば</p>
 <ul>
-<li>A/Bテストはシンプルで実装も簡単</li>
-<li>ビジネスに大きな影響をもたらしうる強力な手法</li>
-<li>正しく実行することは難しい</li>
+<li>ウェブサイトに滞在した秒数</li>
+<li>画面の表示領域に入ったウェブサイトのコンテンツの割合</li>
 </ul>
-<p>本章ではA/Bテストを用いて数理的に意思決定する方法を学ぶ．</p>
+<p>などが考えられる．特にここでは後者を扱う．データについて以下のURLのものを使う．</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="id_02-03-00-visit-time.html#cb35-1" aria-hidden="true" tabindex="-1"></a>url <span class="ot">&lt;-</span> <span class="st">&quot;https://www.oreilly.co.jp/pub/9784873119168/data/time-on-page.csv&quot;</span></span>
+<span id="cb35-2"><a href="id_02-03-00-visit-time.html#cb35-2" aria-hidden="true" tabindex="-1"></a>time_on_page <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(url) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-3"><a href="id_02-03-00-visit-time.html#cb35-3" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb35-4"><a href="id_02-03-00-visit-time.html#cb35-4" aria-hidden="true" tabindex="-1"></a>  magrittr<span class="sc">::</span><span class="fu">set_colnames</span>(<span class="st">&quot;time_on_page&quot;</span>)</span>
+<span id="cb35-5"><a href="id_02-03-00-visit-time.html#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(time_on_page)</span></code></pre></div>
+<pre><code>## tibble [222 × 1] (S3: tbl_df/tbl/data.frame)
+##  $ time_on_page: int [1:222] 178 4 112 576 419 41 93 10 59 87 ...</code></pre>
+<p>このデータセットは１列しかなく，一つのレコードが一回のアクセスの滞在時間となっている．
+このデータの分布のヒストグラムがFig <a href="#histogram-time-on-page"><strong>??</strong></a> である．
+裾が重い分布になっていて異常に大きな値があることがわかる．</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="id_02-03-00-visit-time.html#cb37-1" aria-hidden="true" tabindex="-1"></a>time_on_page <span class="sc">%&gt;%</span> </span>
+<span id="cb37-2"><a href="id_02-03-00-visit-time.html#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb37-3"><a href="id_02-03-00-visit-time.html#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> time_on_page), <span class="at">binwidth =</span> <span class="dv">30</span>)</span></code></pre></div>
+<div class="figure"><span style="display:block;" id="fig:histogram-time-on-page"></span>
+<img src="_main_files/figure-html/histogram-time-on-page-1.png" alt="アクセスごとの滞在時間のヒストグラム" width="672" />
+<p class="caption">
+Figure 2.6: アクセスごとの滞在時間のヒストグラム
+</p>
 </div>
+<p>このような分布は中央値と平均に乖離が大きいことが多い，実際</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="id_02-03-00-visit-time.html#cb38-1" aria-hidden="true" tabindex="-1"></a>time_on_page <span class="sc">%&gt;%</span> </span>
+<span id="cb38-2"><a href="id_02-03-00-visit-time.html#cb38-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">reframe</span>(<span class="at">n =</span> <span class="fu">n</span>(), <span class="at">mean =</span> <span class="fu">mean</span>(time_on_page), </span>
+<span id="cb38-3"><a href="id_02-03-00-visit-time.html#cb38-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">median =</span> <span class="fu">median</span>(time_on_page), <span class="at">sd =</span> <span class="fu">sd</span>(time_on_page)) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-4"><a href="id_02-03-00-visit-time.html#cb38-4" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb38-5"><a href="id_02-03-00-visit-time.html#cb38-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;time_on_pageの要約統計量&quot;</span>,</span>
+<span id="cb38-6"><a href="id_02-03-00-visit-time.html#cb38-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="st">&quot;summary-of-time-on-page&quot;</span></span>
+<span id="cb38-7"><a href="id_02-03-00-visit-time.html#cb38-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-8"><a href="id_02-03-00-visit-time.html#cb38-8" aria-hidden="true" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:summary-of-time-on-page">Table 2.6: </span>time_on_pageの要約統計量
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+n
+</th>
+<th style="text-align:right;">
+mean
+</th>
+<th style="text-align:right;">
+median
+</th>
+<th style="text-align:right;">
+sd
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+222
+</td>
+<td style="text-align:right;">
+202.3333
+</td>
+<td style="text-align:right;">
+78
+</td>
+<td style="text-align:right;">
+343.2041
+</td>
+</tr>
+</tbody>
+</table>
+<p>ここでは，滞在時間がパラメータ<span class="math inline">\(\theta\)</span>の指数分布に従うとして，ベイズ推論を行う．
+<span class="math inline">\(\theta\)</span>の事前分布としては無情報の事前分布の意味で一様分布を採用する．</p>
+<p>パラメータ<span class="math inline">\(\theta\)</span>の指数分布とは以下の確率密度関数を持つ確率分布である．
+<span class="math display" id="eq:exponential-pdf">\[\begin{align}
+p(x|\theta) = \dfrac{\exp(-x/\theta)}{\theta}
+\tag{2.4}
+\end{align}\]</span></p>
+<p>また，モデルとしては以下を考えることになる．</p>
+<p><span class="math display" id="eq:model-for-time-on-page">\[\begin{align}
+\begin{aligned}
+  \theta &amp;\sim \text{Uniform}(0, 3000) \\
+  t &amp;\sim \text{Exponential}(\theta)
+\end{aligned}
+\tag{2.5}
+\end{align}\]</span></p>
+<p>time</p>
+
+</div>
+<!-- </div> -->
             </section>
 
           </div>
         </div>
       </div>
-<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="id_01-01-situation.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="id_02-02-00-review-score.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="id_99_references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

@@ -23,7 +23,7 @@
 <meta name="author" content="Masayuki Sakai" />
 
 
-<meta name="date" content="2023-02-10" />
+<meta name="date" content="2023-04-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -53,12 +53,14 @@
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
-<script src="libs/plotly-binding-4.10.0/plotly.js"></script>
+<script src="libs/plotly-binding-4.10.1/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
-<link href="libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
-<script src="libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 
 
 <style type="text/css">
@@ -190,6 +192,17 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="1.9" data-path="id_01-08-introduce-new-random-variable.html"><a href="id_01-08-introduce-new-random-variable.html"><i class="fa fa-check"></i><b>1.9</b> 新たな確率変数を導入する</a></li>
 </ul></li>
+<li class="chapter" data-level="2" data-path="id_02-00-00-inference-with-rstan.html"><a href="id_02-00-00-inference-with-rstan.html"><i class="fa fa-check"></i><b>2</b> RStanを使った推論</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="id_02-02-00-review-score.html"><a href="id_02-02-00-review-score.html"><i class="fa fa-check"></i><b>2.1</b> 真のレビュースコア</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="id_02-02-00-review-score.html"><a href="id_02-02-00-review-score.html#ディリクレ分布による事前分布"><i class="fa fa-check"></i><b>2.1.1</b> ディリクレ分布による事前分布</a></li>
+<li class="chapter" data-level="2.1.2" data-path="id_02-02-00-review-score.html"><a href="id_02-02-00-review-score.html#推論の実行"><i class="fa fa-check"></i><b>2.1.2</b> 推論の実行</a></li>
+<li class="chapter" data-level="2.1.3" data-path="id_02-02-00-review-score.html"><a href="id_02-02-00-review-score.html#item-bについての推論"><i class="fa fa-check"></i><b>2.1.3</b> Item Bについての推論</a></li>
+<li class="chapter" data-level="2.1.4" data-path="id_02-02-00-review-score.html"><a href="id_02-02-00-review-score.html#推定結果の比較"><i class="fa fa-check"></i><b>2.1.4</b> 推定結果の比較</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="id_02-03-00-visit-time.html"><a href="id_02-03-00-visit-time.html"><i class="fa fa-check"></i><b>2.2</b> 滞在時間をテストする</a></li>
+</ul></li>
 <li class="chapter" data-level="" data-path="id_99_references.html"><a href="id_99_references.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io" target="blank">GitHub repository</a></li>
@@ -259,69 +272,69 @@ HDIは確率変数の値が高い確率で現れる区間を表していて，�
 <h3><span class="header-section-number">1.8.2</span> HDIをつかった仮設検定<a href="id_01-07-decision-making.html#id_01-07-test-with-hdi" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>本来連続型の確率分布に対して定義されているHDIだが，同様の考え方を用いで離散型の確率分布にも適用してみよう．
 ここでは，確率質量が多い確率変数の値を順に追加していく，という操作をする．</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="id_01-07-decision-making.html#cb18-1" aria-hidden="true" tabindex="-1"></a>hmv <span class="ot">&lt;-</span> <span class="cf">function</span>(xs, ps, <span class="at">alpha=</span><span class="fl">0.95</span>){</span>
-<span id="cb18-2"><a href="id_01-07-decision-making.html#cb18-2" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">xs=</span>xs, <span class="at">ps=</span>ps) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-3"><a href="id_01-07-decision-making.html#cb18-3" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">arrange</span>(<span class="fu">desc</span>(ps)) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-4"><a href="id_01-07-decision-making.html#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">cumsum_ps =</span> <span class="fu">cumsum</span>(ps))</span>
-<span id="cb18-5"><a href="id_01-07-decision-making.html#cb18-5" aria-hidden="true" tabindex="-1"></a>  hmv_range <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
-<span id="cb18-6"><a href="id_01-07-decision-making.html#cb18-6" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(cumsum_ps <span class="sc">&lt;=</span> alpha) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-7"><a href="id_01-07-decision-making.html#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>(xs) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-8"><a href="id_01-07-decision-making.html#cb18-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">range</span>()</span>
-<span id="cb18-9"><a href="id_01-07-decision-making.html#cb18-9" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb18-10"><a href="id_01-07-decision-making.html#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">range=</span>hmv_range,</span>
-<span id="cb18-11"><a href="id_01-07-decision-making.html#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">x=</span>df</span>
-<span id="cb18-12"><a href="id_01-07-decision-making.html#cb18-12" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb18-13"><a href="id_01-07-decision-making.html#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
-<span id="cb18-14"><a href="id_01-07-decision-making.html#cb18-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="id_01-07-decision-making.html#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># AliceのA案の結果についてhmvを計算する</span></span>
-<span id="cb19-2"><a href="id_01-07-decision-making.html#cb19-2" aria-hidden="true" tabindex="-1"></a>Alice_A <span class="ot">&lt;-</span> results <span class="sc">%&gt;%</span> </span>
-<span id="cb19-3"><a href="id_01-07-decision-making.html#cb19-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(</span>
-<span id="cb19-4"><a href="id_01-07-decision-making.html#cb19-4" aria-hidden="true" tabindex="-1"></a>    name <span class="sc">==</span> <span class="st">&quot;Alice&quot;</span>,</span>
-<span id="cb19-5"><a href="id_01-07-decision-making.html#cb19-5" aria-hidden="true" tabindex="-1"></a>    type <span class="sc">==</span> <span class="st">&quot;A&quot;</span></span>
-<span id="cb19-6"><a href="id_01-07-decision-making.html#cb19-6" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb19-7"><a href="id_01-07-decision-making.html#cb19-7" aria-hidden="true" tabindex="-1"></a>hmv_Alice_a <span class="ot">&lt;-</span> <span class="fu">hmv</span>(<span class="at">xs=</span>Alice_A<span class="sc">$</span>thetas, <span class="at">ps=</span>Alice_A<span class="sc">$</span>p)</span>
-<span id="cb19-8"><a href="id_01-07-decision-making.html#cb19-8" aria-hidden="true" tabindex="-1"></a>hmv_Alice_a<span class="sc">$</span>range</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="id_01-07-decision-making.html#cb19-1" aria-hidden="true" tabindex="-1"></a>hmv <span class="ot">&lt;-</span> <span class="cf">function</span>(xs, ps, <span class="at">alpha=</span><span class="fl">0.95</span>){</span>
+<span id="cb19-2"><a href="id_01-07-decision-making.html#cb19-2" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">xs=</span>xs, <span class="at">ps=</span>ps) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-3"><a href="id_01-07-decision-making.html#cb19-3" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">arrange</span>(<span class="fu">desc</span>(ps)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-4"><a href="id_01-07-decision-making.html#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">cumsum_ps =</span> <span class="fu">cumsum</span>(ps))</span>
+<span id="cb19-5"><a href="id_01-07-decision-making.html#cb19-5" aria-hidden="true" tabindex="-1"></a>  hmv_range <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb19-6"><a href="id_01-07-decision-making.html#cb19-6" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(cumsum_ps <span class="sc">&lt;=</span> alpha) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-7"><a href="id_01-07-decision-making.html#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>(xs) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-8"><a href="id_01-07-decision-making.html#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">range</span>()</span>
+<span id="cb19-9"><a href="id_01-07-decision-making.html#cb19-9" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb19-10"><a href="id_01-07-decision-making.html#cb19-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">range=</span>hmv_range,</span>
+<span id="cb19-11"><a href="id_01-07-decision-making.html#cb19-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">x=</span>df</span>
+<span id="cb19-12"><a href="id_01-07-decision-making.html#cb19-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb19-13"><a href="id_01-07-decision-making.html#cb19-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb19-14"><a href="id_01-07-decision-making.html#cb19-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="id_01-07-decision-making.html#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># AliceのA案の結果についてhmvを計算する</span></span>
+<span id="cb20-2"><a href="id_01-07-decision-making.html#cb20-2" aria-hidden="true" tabindex="-1"></a>Alice_A <span class="ot">&lt;-</span> results <span class="sc">%&gt;%</span> </span>
+<span id="cb20-3"><a href="id_01-07-decision-making.html#cb20-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(</span>
+<span id="cb20-4"><a href="id_01-07-decision-making.html#cb20-4" aria-hidden="true" tabindex="-1"></a>    name <span class="sc">==</span> <span class="st">&quot;Alice&quot;</span>,</span>
+<span id="cb20-5"><a href="id_01-07-decision-making.html#cb20-5" aria-hidden="true" tabindex="-1"></a>    type <span class="sc">==</span> <span class="st">&quot;A&quot;</span></span>
+<span id="cb20-6"><a href="id_01-07-decision-making.html#cb20-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb20-7"><a href="id_01-07-decision-making.html#cb20-7" aria-hidden="true" tabindex="-1"></a>hmv_Alice_a <span class="ot">&lt;-</span> <span class="fu">hmv</span>(<span class="at">xs=</span>Alice_A<span class="sc">$</span>thetas, <span class="at">ps=</span>Alice_A<span class="sc">$</span>p)</span>
+<span id="cb20-8"><a href="id_01-07-decision-making.html#cb20-8" aria-hidden="true" tabindex="-1"></a>hmv_Alice_a<span class="sc">$</span>range</span></code></pre></div>
 <pre><code>## [1] 0.009 0.148</code></pre>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="id_01-07-decision-making.html#cb21-1" aria-hidden="true" tabindex="-1"></a>plots <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb21-2"><a href="id_01-07-decision-making.html#cb21-2" aria-hidden="true" tabindex="-1"></a>i <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb21-3"><a href="id_01-07-decision-making.html#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-4"><a href="id_01-07-decision-making.html#cb21-4" aria-hidden="true" tabindex="-1"></a>hdi_summary <span class="ot">&lt;-</span> <span class="fu">tibble</span>()</span>
-<span id="cb21-5"><a href="id_01-07-decision-making.html#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-6"><a href="id_01-07-decision-making.html#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(tgt_name <span class="cf">in</span> <span class="fu">c</span>(<span class="st">&quot;Alice&quot;</span>, <span class="st">&quot;Bob&quot;</span>)){</span>
-<span id="cb21-7"><a href="id_01-07-decision-making.html#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(tgt_type <span class="cf">in</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>)){</span>
-<span id="cb21-8"><a href="id_01-07-decision-making.html#cb21-8" aria-hidden="true" tabindex="-1"></a>    df <span class="ot">&lt;-</span> results <span class="sc">%&gt;%</span> </span>
-<span id="cb21-9"><a href="id_01-07-decision-making.html#cb21-9" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">filter</span>(</span>
-<span id="cb21-10"><a href="id_01-07-decision-making.html#cb21-10" aria-hidden="true" tabindex="-1"></a>        name <span class="sc">==</span> tgt_name,</span>
-<span id="cb21-11"><a href="id_01-07-decision-making.html#cb21-11" aria-hidden="true" tabindex="-1"></a>        type <span class="sc">==</span> tgt_type</span>
-<span id="cb21-12"><a href="id_01-07-decision-making.html#cb21-12" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb21-13"><a href="id_01-07-decision-making.html#cb21-13" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb21-14"><a href="id_01-07-decision-making.html#cb21-14" aria-hidden="true" tabindex="-1"></a>    fill_range <span class="ot">&lt;-</span> <span class="fu">hmv</span>(<span class="at">xs=</span>df<span class="sc">$</span>thetas, <span class="at">ps=</span>df<span class="sc">$</span>p)<span class="sc">$</span>range</span>
-<span id="cb21-15"><a href="id_01-07-decision-making.html#cb21-15" aria-hidden="true" tabindex="-1"></a>    hdi_summary <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb21-16"><a href="id_01-07-decision-making.html#cb21-16" aria-hidden="true" tabindex="-1"></a>      hdi_summary,</span>
-<span id="cb21-17"><a href="id_01-07-decision-making.html#cb21-17" aria-hidden="true" tabindex="-1"></a>      <span class="fu">tibble</span>(<span class="at">name=</span>tgt_name, <span class="at">type=</span>tgt_name, </span>
-<span id="cb21-18"><a href="id_01-07-decision-making.html#cb21-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">hid_min=</span>fill_range[<span class="dv">1</span>], <span class="at">hdi_max=</span>fill_range[<span class="dv">2</span>])</span>
-<span id="cb21-19"><a href="id_01-07-decision-making.html#cb21-19" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb21-20"><a href="id_01-07-decision-making.html#cb21-20" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb21-21"><a href="id_01-07-decision-making.html#cb21-21" aria-hidden="true" tabindex="-1"></a>    bounds <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
-<span id="cb21-22"><a href="id_01-07-decision-making.html#cb21-22" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">filter</span>(</span>
-<span id="cb21-23"><a href="id_01-07-decision-making.html#cb21-23" aria-hidden="true" tabindex="-1"></a>        thetas <span class="sc">&gt;</span> fill_range[<span class="dv">1</span>],</span>
-<span id="cb21-24"><a href="id_01-07-decision-making.html#cb21-24" aria-hidden="true" tabindex="-1"></a>        thetas <span class="sc">&lt;</span> fill_range[<span class="dv">2</span>]</span>
-<span id="cb21-25"><a href="id_01-07-decision-making.html#cb21-25" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb21-26"><a href="id_01-07-decision-making.html#cb21-26" aria-hidden="true" tabindex="-1"></a>    plots[[i]] <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
-<span id="cb21-27"><a href="id_01-07-decision-making.html#cb21-27" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">filter</span>(thetas <span class="sc">&lt;</span> <span class="fl">0.3</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-28"><a href="id_01-07-decision-making.html#cb21-28" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>thetas, <span class="at">y=</span>p)) <span class="sc">+</span> </span>
-<span id="cb21-29"><a href="id_01-07-decision-making.html#cb21-29" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb21-30"><a href="id_01-07-decision-making.html#cb21-30" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_ribbon</span>(<span class="at">data=</span>bounds, <span class="fu">aes</span>(<span class="at">ymax=</span>p), <span class="at">ymin=</span><span class="dv">0</span>, <span class="at">fill=</span><span class="st">&quot;orange&quot;</span>, <span class="at">alpha=</span><span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb21-31"><a href="id_01-07-decision-making.html#cb21-31" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ggtitle</span>(<span class="at">label=</span><span class="fu">glue</span>(<span class="st">&quot;{tgt_name} - {tgt_type}&quot;</span>), </span>
-<span id="cb21-32"><a href="id_01-07-decision-making.html#cb21-32" aria-hidden="true" tabindex="-1"></a>              <span class="at">subtitle =</span> <span class="fu">glue</span>(<span class="st">&quot;HDI: [{fill_range[1]}, {fill_range[2]}]&quot;</span>))</span>
-<span id="cb21-33"><a href="id_01-07-decision-making.html#cb21-33" aria-hidden="true" tabindex="-1"></a>    i <span class="ot">&lt;-</span> i<span class="sc">+</span><span class="dv">1</span></span>
-<span id="cb21-34"><a href="id_01-07-decision-making.html#cb21-34" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb21-35"><a href="id_01-07-decision-making.html#cb21-35" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb21-36"><a href="id_01-07-decision-making.html#cb21-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-37"><a href="id_01-07-decision-making.html#cb21-37" aria-hidden="true" tabindex="-1"></a>gridExtra<span class="sc">::</span><span class="fu">grid.arrange</span>(</span>
-<span id="cb21-38"><a href="id_01-07-decision-making.html#cb21-38" aria-hidden="true" tabindex="-1"></a>  plots[[<span class="dv">1</span>]],plots[[<span class="dv">3</span>]],plots[[<span class="dv">2</span>]],plots[[<span class="dv">4</span>]],</span>
-<span id="cb21-39"><a href="id_01-07-decision-making.html#cb21-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">nrow=</span><span class="dv">2</span>, <span class="at">ncol=</span><span class="dv">2</span></span>
-<span id="cb21-40"><a href="id_01-07-decision-making.html#cb21-40" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="id_01-07-decision-making.html#cb22-1" aria-hidden="true" tabindex="-1"></a>plots <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb22-2"><a href="id_01-07-decision-making.html#cb22-2" aria-hidden="true" tabindex="-1"></a>i <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb22-3"><a href="id_01-07-decision-making.html#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="id_01-07-decision-making.html#cb22-4" aria-hidden="true" tabindex="-1"></a>hdi_summary <span class="ot">&lt;-</span> <span class="fu">tibble</span>()</span>
+<span id="cb22-5"><a href="id_01-07-decision-making.html#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="id_01-07-decision-making.html#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(tgt_name <span class="cf">in</span> <span class="fu">c</span>(<span class="st">&quot;Alice&quot;</span>, <span class="st">&quot;Bob&quot;</span>)){</span>
+<span id="cb22-7"><a href="id_01-07-decision-making.html#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(tgt_type <span class="cf">in</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>)){</span>
+<span id="cb22-8"><a href="id_01-07-decision-making.html#cb22-8" aria-hidden="true" tabindex="-1"></a>    df <span class="ot">&lt;-</span> results <span class="sc">%&gt;%</span> </span>
+<span id="cb22-9"><a href="id_01-07-decision-making.html#cb22-9" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">filter</span>(</span>
+<span id="cb22-10"><a href="id_01-07-decision-making.html#cb22-10" aria-hidden="true" tabindex="-1"></a>        name <span class="sc">==</span> tgt_name,</span>
+<span id="cb22-11"><a href="id_01-07-decision-making.html#cb22-11" aria-hidden="true" tabindex="-1"></a>        type <span class="sc">==</span> tgt_type</span>
+<span id="cb22-12"><a href="id_01-07-decision-making.html#cb22-12" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb22-13"><a href="id_01-07-decision-making.html#cb22-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb22-14"><a href="id_01-07-decision-making.html#cb22-14" aria-hidden="true" tabindex="-1"></a>    fill_range <span class="ot">&lt;-</span> <span class="fu">hmv</span>(<span class="at">xs=</span>df<span class="sc">$</span>thetas, <span class="at">ps=</span>df<span class="sc">$</span>p)<span class="sc">$</span>range</span>
+<span id="cb22-15"><a href="id_01-07-decision-making.html#cb22-15" aria-hidden="true" tabindex="-1"></a>    hdi_summary <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb22-16"><a href="id_01-07-decision-making.html#cb22-16" aria-hidden="true" tabindex="-1"></a>      hdi_summary,</span>
+<span id="cb22-17"><a href="id_01-07-decision-making.html#cb22-17" aria-hidden="true" tabindex="-1"></a>      <span class="fu">tibble</span>(<span class="at">name=</span>tgt_name, <span class="at">type=</span>tgt_name, </span>
+<span id="cb22-18"><a href="id_01-07-decision-making.html#cb22-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">hid_min=</span>fill_range[<span class="dv">1</span>], <span class="at">hdi_max=</span>fill_range[<span class="dv">2</span>])</span>
+<span id="cb22-19"><a href="id_01-07-decision-making.html#cb22-19" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb22-20"><a href="id_01-07-decision-making.html#cb22-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb22-21"><a href="id_01-07-decision-making.html#cb22-21" aria-hidden="true" tabindex="-1"></a>    bounds <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb22-22"><a href="id_01-07-decision-making.html#cb22-22" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">filter</span>(</span>
+<span id="cb22-23"><a href="id_01-07-decision-making.html#cb22-23" aria-hidden="true" tabindex="-1"></a>        thetas <span class="sc">&gt;</span> fill_range[<span class="dv">1</span>],</span>
+<span id="cb22-24"><a href="id_01-07-decision-making.html#cb22-24" aria-hidden="true" tabindex="-1"></a>        thetas <span class="sc">&lt;</span> fill_range[<span class="dv">2</span>]</span>
+<span id="cb22-25"><a href="id_01-07-decision-making.html#cb22-25" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb22-26"><a href="id_01-07-decision-making.html#cb22-26" aria-hidden="true" tabindex="-1"></a>    plots[[i]] <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb22-27"><a href="id_01-07-decision-making.html#cb22-27" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">filter</span>(thetas <span class="sc">&lt;</span> <span class="fl">0.3</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-28"><a href="id_01-07-decision-making.html#cb22-28" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>thetas, <span class="at">y=</span>p)) <span class="sc">+</span> </span>
+<span id="cb22-29"><a href="id_01-07-decision-making.html#cb22-29" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb22-30"><a href="id_01-07-decision-making.html#cb22-30" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_ribbon</span>(<span class="at">data=</span>bounds, <span class="fu">aes</span>(<span class="at">ymax=</span>p), <span class="at">ymin=</span><span class="dv">0</span>, <span class="at">fill=</span><span class="st">&quot;orange&quot;</span>, <span class="at">alpha=</span><span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb22-31"><a href="id_01-07-decision-making.html#cb22-31" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ggtitle</span>(<span class="at">label=</span><span class="fu">glue</span>(<span class="st">&quot;{tgt_name} - {tgt_type}&quot;</span>), </span>
+<span id="cb22-32"><a href="id_01-07-decision-making.html#cb22-32" aria-hidden="true" tabindex="-1"></a>              <span class="at">subtitle =</span> <span class="fu">glue</span>(<span class="st">&quot;HDI: [{fill_range[1]}, {fill_range[2]}]&quot;</span>))</span>
+<span id="cb22-33"><a href="id_01-07-decision-making.html#cb22-33" aria-hidden="true" tabindex="-1"></a>    i <span class="ot">&lt;-</span> i<span class="sc">+</span><span class="dv">1</span></span>
+<span id="cb22-34"><a href="id_01-07-decision-making.html#cb22-34" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb22-35"><a href="id_01-07-decision-making.html#cb22-35" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb22-36"><a href="id_01-07-decision-making.html#cb22-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-37"><a href="id_01-07-decision-making.html#cb22-37" aria-hidden="true" tabindex="-1"></a>gridExtra<span class="sc">::</span><span class="fu">grid.arrange</span>(</span>
+<span id="cb22-38"><a href="id_01-07-decision-making.html#cb22-38" aria-hidden="true" tabindex="-1"></a>  plots[[<span class="dv">1</span>]],plots[[<span class="dv">3</span>]],plots[[<span class="dv">2</span>]],plots[[<span class="dv">4</span>]],</span>
+<span id="cb22-39"><a href="id_01-07-decision-making.html#cb22-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">nrow=</span><span class="dv">2</span>, <span class="at">ncol=</span><span class="dv">2</span></span>
+<span id="cb22-40"><a href="id_01-07-decision-making.html#cb22-40" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <div class="figure"><span style="display:block;" id="fig:posterior-dist-with-hmv-range"></span>
 <img src="_main_files/figure-html/posterior-dist-with-hmv-range-1.png" alt="事後分布とHDI" width="672" />
 <p class="caption">
@@ -336,41 +349,83 @@ Figure 1.9: 事後分布とHDI
 </ul>
 <p>一般的には95%HDIを仮設検定に利用することが多い．ただしこの閾値は分析者によって決定されるものでありそれはチームで合意を取るべき数値である．</p>
 <p>さて，HDIのサマリである表<a href="id_01-07-decision-making.html#tab:hdi-summary-1">1.2</a>を見るとAlice-BのHDIは<span class="math inline">\([0.026, 0.175]\)</span>，Bob-Bは<span class="math inline">\([0.068, 0.093]\)</span>であり，5%が含まれているのはAlice-Bである．これより，Alice-Bについては仮説が成り立つとは言えず，Bob-Bは成り立っていると言えるだろう．</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="id_01-07-decision-making.html#cb22-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(hdi_summary, <span class="at">label =</span> <span class="st">&quot;hdi-summary-1&quot;</span>, <span class="at">caption =</span> <span class="st">&quot;Alice，BobそれぞれのHDIの範囲&quot;</span>) </span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="id_01-07-decision-making.html#cb23-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(hdi_summary, <span class="at">label =</span> <span class="st">&quot;hdi-summary-1&quot;</span>, <span class="at">caption =</span> <span class="st">&quot;Alice，BobそれぞれのHDIの範囲&quot;</span>) </span></code></pre></div>
 <table>
-<caption><span id="tab:hdi-summary-1">Table 1.2: </span>Alice，BobそれぞれのHDIの範囲</caption>
+<caption>
+<span id="tab:hdi-summary-1">Table 1.2: </span>Alice，BobそれぞれのHDIの範囲
+</caption>
 <thead>
-<tr class="header">
-<th align="left">name</th>
-<th align="left">type</th>
-<th align="right">hid_min</th>
-<th align="right">hdi_max</th>
+<tr>
+<th style="text-align:left;">
+name
+</th>
+<th style="text-align:left;">
+type
+</th>
+<th style="text-align:right;">
+hid_min
+</th>
+<th style="text-align:right;">
+hdi_max
+</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">Alice</td>
-<td align="left">Alice</td>
-<td align="right">0.009</td>
-<td align="right">0.148</td>
+<tr>
+<td style="text-align:left;">
+Alice
+</td>
+<td style="text-align:left;">
+Alice
+</td>
+<td style="text-align:right;">
+0.009
+</td>
+<td style="text-align:right;">
+0.148
+</td>
 </tr>
-<tr class="even">
-<td align="left">Alice</td>
-<td align="left">Alice</td>
-<td align="right">0.026</td>
-<td align="right">0.175</td>
+<tr>
+<td style="text-align:left;">
+Alice
+</td>
+<td style="text-align:left;">
+Alice
+</td>
+<td style="text-align:right;">
+0.026
+</td>
+<td style="text-align:right;">
+0.175
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Bob</td>
-<td align="left">Bob</td>
-<td align="right">0.040</td>
-<td align="right">0.062</td>
+<tr>
+<td style="text-align:left;">
+Bob
+</td>
+<td style="text-align:left;">
+Bob
+</td>
+<td style="text-align:right;">
+0.040
+</td>
+<td style="text-align:right;">
+0.062
+</td>
 </tr>
-<tr class="even">
-<td align="left">Bob</td>
-<td align="left">Bob</td>
-<td align="right">0.068</td>
-<td align="right">0.093</td>
+<tr>
+<td style="text-align:left;">
+Bob
+</td>
+<td style="text-align:left;">
+Bob
+</td>
+<td style="text-align:right;">
+0.068
+</td>
+<td style="text-align:right;">
+0.093
+</td>
 </tr>
 </tbody>
 </table>
