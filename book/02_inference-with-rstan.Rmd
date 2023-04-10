@@ -1,0 +1,401 @@
+# RStanを使った推論 {#02-00-00-inference-with-rstan}
+
+[1章](#01-intro)では事前分布の設定，事後分布の導出からサンプル生成までを実装した上でおこなっていだが，
+複雑なモデリングの場合は実装が難しい場合もある．
+ここからはベイズ推論のためのフレームワークStanをRから呼び出せる[RStan](https://mc-stan.org/users/interfaces/rstan)を利用した推論を行なっていく．
+
+あらかじめ[公式ドキュメント](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started-(Japanese))を参考に必要に応じてRstanをインストールしておくこと．
+
+## 真のレビュースコア {#02-02-00-review-score}
+
+レビューのスコアについてベイス推定を行う．ここでは次のTable \@ref(tab:data-review-score) のデータが得られているとして進めていく．
+
+```{r data-review-score}
+review_score <- tibble(
+  item = rep(c('A', 'B'), each = 5),
+  score = base::rep(1:5, times = 2),
+  count = c(20, 10, 36, 91, 170,
+            0, 0, 4, 0, 6)
+)
+
+review_score %>% 
+  pivot_wider(names_from = "score", values_from = "count") %>% 
+  knitr::kable(caption = "仮想のレビュースコアのデータ",
+               label = "data-review-score") %>% 
+  kableExtra::kable_styling(full_width = FALSE)
+```
+
+これらのレビューについて回答数と平均点を計算するとTable \@ref(tab:summary-of-review-score) のようになる．
+
+```{r summary-of-review-score, echo=FALSE}
+review_score %>% 
+  mutate(point = score * count) %>% 
+  group_by(item) %>% 
+  summarise(total_count = sum(count), mean = sum(point) / total_count) %>% 
+  knitr::kable(caption = "レビュースコアのアイテムごとの回答人数と平均",
+               label = "summary-of-review-score") %>% 
+  kableExtra::kable_styling(full_width = FALSE)
+```
+
+平均点を見るとどちらも同じ位でかつBの方が若干高い．しかし回答数をみるとAの方が信頼できそうに思える．
+
+このデータについては複数の値を取るカテゴリデータと見做してモデルを式 \@ref(eq:review-score-model) のように考えよう．
+
+\begin{align}
+\begin{aligned}
+  \bm \theta &\sim \text{Dirichlet}(\bm \alpha) \\
+  \bm r &\sim \text{Categorical}(\bm \theta)
+\end{aligned}
+(\#eq:review-score-model)
+\end{align}
+
+ディリクレ分布は$K$次元で，要素が$[0,1]$の値を取り，その総和が$1$となるような確率変数ベクトルが従う確率分布である．ディリクレ分布自体はパラメータとして$K$次元ベクトル$\boldsymbol \alpha$を取る．
+
+### ディリクレ分布による事前分布
+
+ここで事前分布には簡単のため以下の式 \@ref(eq:review-score-model-posterior) を採用しよう．
+
+\begin{align}
+\begin{aligned}
+  \bm \theta &\sim \text{Dirichlet}(\bm \alpha = (1,1,1,1,1)) \\
+  \bm r &\sim \text{Categorical}(\bm \theta)
+\end{aligned}
+(\#eq:review-score-model-posterior)
+\end{align}
+
+### 推論の実行  
+
+RStanでこのモデルについてMCMCを行い事後分布を推定する．stanのコードは次のようになる．
+
+```
+data {
+  int n;
+  int<lower=1> n_category;
+  int<lower=0> counts[n];
+  vector<lower=0>[n_category] alpha;
+}
+
+parameters {
+  simplex[n_category] theta;
+}
+
+model {
+  theta ~ dirichlet(alpha);
+  counts ~ multinomial(theta);  
+}
+
+```
+
+このstanコードを実行して結果を得よう．
+
+```{r execute-stan-review-score-A, eval = FALSE}
+# item A について多項分布・ディリクレ分布によるベイズ推論を行う
+df %>% 
+  dplyr::filter(item == "A")
+
+n_category <- 5 # カテゴリ数
+counts <- df$count # レビュースコアのカウント
+alphas <- c(1,1,1,1,1) # ディリクレ分布のパラメーター
+
+review_data <- list(
+  n_category = n_category,
+  counts = counts,
+  alpha = alpha
+)
+
+# stanの実行
+model_path <- "[path to the stan file]"
+seed = 1234
+
+fit_item_a <- rstan::stan(
+  file = model_path,
+  data = review_data,
+  seed = seed,
+  iter = 4000,
+  chain = 4,
+  control = list(
+    max_treedepth = 15
+  )
+)
+```
+
+```{r load-stan-result-item-a, echo=FALSE}
+fit_item_a <- readRDS("script/chapter02/stan/review-score-01.obj")
+```
+
+
+推定結果は \@ref(tab:stan-result-item-a) のようになった．
+
+```{r stan-result-item-a, echo=FALSE}
+summary(fit_item_a)$summary %>% 
+  as.data.frame() %>% 
+  rownames_to_column() %>% 
+  as_tibble() %>% 
+  dplyr::filter(rowname != "lp__") %>% 
+  select(mean, se_mean, sd, `2.5%`, `50%`, `97.5%`, Rhat) %>% 
+  round(3) %>% 
+  knitr::kable(caption = "Item Aのレビューに対するベイズ推論の結果",
+               label = "stan-result-item-a")
+```
+
+```{r density-of-stan-result-item-a, message=FALSE, fig.cap = "Item Aにおける多項分布のパラメータの事後分布"}
+ms_a <- rstan::extract(fit_item_a)
+ms_a$theta %>% 
+  tidyr::as_tibble(.name_repair = "unique") %>% 
+  magrittr::set_colnames(paste("theta", 1:5, sep="_")) %>% 
+  tidyr::pivot_longer(cols=everything(),
+               names_to = "theta",
+               values_to = "sample") %>% 
+  ggplot() + 
+  geom_density(aes(x = sample), fill = "blue", alpha = 0.4) + 
+  facet_wrap(~theta)
+```
+いまレビューの平均スコアを式 \@ref(eq:average-review-score) のように定義すると
+
+\begin{align}
+m = 1 \theta_1 + 2 \theta_2 + 3 \theta_3 + 4 \theta_4 + 5 \theta_5
+(\#eq:average-review-score)
+\end{align}
+
+この確率変数に対してMCMCのサンプルを用いて事後分布を求めることができる．
+
+```{r posterior-avg-score-item-a, fig.cap = "Item Aの平均レビュースコアの事後分布"}
+posterior_avg <- ms_a$theta %*% 1:5 
+above4_a <- round(mean(posterior_avg > 4), 3)
+subtitle <- glue::glue("proportion of > 4 = {above4_a}")
+posterior_avg %>% 
+  tidyr::as_tibble() %>% 
+  ggplot() + 
+  geom_density(aes(x = V1), fill = "blue", alpha = 0.4) + 
+  xlim(0, 5) + 
+  ggtitle(label = "Posterior distribution of Average: Item A", subtitle = subtitle) -> pa_avg
+pa_avg
+```
+
+この事後分布に対して，例えば平均のスコアが4以上になる割合は`r round(mean(posterior_avg > 4),2)`と非常に高く，少なくとも4以上であることは信頼できそうである．
+
+### Item Bについての推論  
+
+全く同様の手続きで，Item Bについても推論を行なってみよう．
+モデルは同じなので渡すデータだけ変更すれば良い．
+
+```{r execute-stan-review-score-B, eval = FALSE}
+df <- review_score %>% 
+  dplyr::filter(item == "B")
+
+data_item_b <- list(
+  n_category = 5,
+  counts = df$count,
+  alpha = c(1,1,1,1,1) # 事前分布のパラメーター
+)
+
+fit_item_b <- rstan::stan(
+  file = "book/script/chapter02/stan/review-score-01.stan",
+  data = data_item_b,
+  seed = 1234,
+  iter = 4000,
+  chain = 4,
+  control = list(max_treedepth = 15)
+)
+```
+
+```{r load-fit-item-b, echo = FALSE}
+# saveRDS(fit_item_b, "book/script/chapter02/stan/review-score-01-item-b.obj")
+fit_item_b <- readRDS("script/chapter02/stan/review-score-01-item-b.obj")
+```
+
+Item Aと同様に推論の結果と事後分布を可視化しておく．
+
+```{r stan-result-item-b}
+summary(fit_item_b)$summary %>% 
+  as.data.frame() %>% 
+  rownames_to_column() %>% 
+  as_tibble() %>% 
+  dplyr::filter(rowname != "lp__") %>% 
+  select(mean, se_mean, sd, `2.5%`, `50%`, `97.5%`, Rhat) %>% 
+  round(3) %>% 
+  knitr::kable(caption = "Item Bのレビューに対するベイズ推論の結果",
+               label = "stan-result-item-b")
+```
+
+
+```{r density-of-stan-result-item-b, message=FALSE, fig.cap = "Item Bにおける多項分布のパラメータの事後分布"}
+ms_b <- rstan::extract(fit_item_b)
+ms_b$theta %>% 
+  tidyr::as_tibble(.name_repair = "unique") %>% 
+  magrittr::set_colnames(paste("theta", 1:5, sep="_")) %>% 
+  tidyr::pivot_longer(cols=everything(),
+               names_to = "theta",
+               values_to = "sample") %>% 
+  ggplot() + 
+  geom_density(aes(x = sample), fill = "orange", alpha = 0.4) + 
+  facet_wrap(~theta)
+```
+
+```{r posterior-avg-score-item-b, fig.cap = "Item Bの平均レビュースコアの事後分布"}
+posterior_avg <- ms_b$theta %*% 1:5 
+above4_a <- round(mean(posterior_avg > 4), 3)
+subtitle <- glue::glue("proportion of > 4 = {above4_a}")
+posterior_avg %>% 
+  tidyr::as_tibble() %>% 
+  ggplot() + 
+  geom_density(aes(x = V1), fill = "orange", alpha = 0.4) + 
+  xlim(0, 5) + 
+  ggtitle(label = "Posterior distribution of Average: Item B", subtitle = subtitle) -> pb_avg
+pb_avg
+```
+
+これらを確認すると，Item Bの方はItem Aに比べて事後分布の形状がやや広いことがわかる．
+これは回答数が少ないため信頼区間が広くとられていると解釈できる．
+
+### 推定結果の比較 
+
+最後にItem AとItem Bについて比較をまとめておこう．
+Fig \@ref(comparing-avg-review-score) は既に示した図を縦に並べたものだが
+この比較で平均レビュースコアがどの程度信頼できるものかを確認できる．
+量的に表す場合，例えば事後分布のサンプルが4以上であるものの割合を計算すれば
+ある意味で平均のスコアが4以上になる確率を推論することができる．
+
+その意味ではItem Aでは事後分布上で4以上となるものは0.987であり少なくとも4以上であるという
+ことはかなり信頼を持って言えそうだ．
+
+一方Item Bでは0.268でありこの商品の平均レビュースコアが少なくとも4以上であるということの
+信頼性は低いと思える．
+
+```{r comparing-avg-review-score, fig.cap = "平均レビュースコアの事後分布の比較", echo = FALSE}
+gridExtra::grid.arrange(
+  pa_avg + ylim(0,6.5), 
+  pb_avg + ylim(0,6.5), 
+  nrow = 2)
+```
+
+
+
+次に，Fig \@ref(fig:spread_draws-of-items) はthetaの事後分布を比較した図である．
+Item Aの場合，thetaの事後分布の幅が比較的狭くなっておりレビューにおけるそれぞれのスコアで
+評価される確率のブレが少ない一方，Item Bの場合は幅が広くブレが大きいことがわかる．
+特に3と5は広く出ており現時点での平均スコアが4.2という値の信頼性が低いと見做せる．
+
+```{r spread_draws-of-items, fig.cap = "thetaの事後分布の比較", echo = FALSE}
+pa <- fit_item_a %>% 
+  tidybayes::spread_draws(theta[condition]) %>% 
+  ggplot(aes(y = fct_rev(as.factor(condition)), x = theta),) + 
+  tidybayes::stat_halfeye(.width = c(.90, .5), fill = "skyblue") + 
+  xlim(0,1) +
+  ylab("posterior") + 
+  ggtitle("Posterior distribution of thetas", 
+          subtitle = "Item A")
+
+pb <- fit_item_b %>% 
+  tidybayes::spread_draws(theta[condition]) %>% 
+  ggplot(aes(y = fct_rev(as.factor(condition)), x = theta),) + 
+  tidybayes::stat_halfeye(.width = c(.90, .5), fill = "violetred2") + 
+  xlim(0,1) +
+  ylab("") + 
+  ggtitle("", subtitle = "Item B")
+
+gridExtra::grid.arrange(pa, pb, nrow=1)
+```
+
+最後にTable \@ref(tab:comparing-hid-of-theta-between-items) はthetaの事後分布におけるHDIを比較した表である．
+HDIの値を確認することでも，事後分布がどれほどの幅を持っているのかを見ることができる．
+
+```{r comparing-hid-of-theta-between-items, echo = FALSE}
+ms_a <- rstan::extract(fit_item_a)
+hdi_a <- ms_a$theta %>% 
+  apply(MARGIN = 2, FUN = function(x) tidybayes::hdi(x, ci=0.95)) %>% 
+  round(3) %>% 
+  apply(MARGIN = 2, FUN = function(x) {
+    interval <- paste(x[1], x[2], sep = " - ")
+    interval_range <- x[2] - x[1]
+    res <- glue::glue("[{interval}] ({interval_range})")
+    return(res)
+    }) %>%
+  tibble::as_tibble_col(column_name = "Item A")
+
+ms_b <- rstan::extract(fit_item_b)
+hdi_b <- ms_b$theta %>% 
+  apply(MARGIN = 2, FUN = function(x) tidybayes::hdi(x, ci=0.95)) %>% 
+  round(3) %>% 
+  apply(MARGIN = 2, FUN = function(x) {
+    interval <- paste(x[1], x[2], sep = " - ")
+    interval_range <- x[2] - x[1]
+    res <- glue::glue("[{interval}] ({interval_range})")
+    return(res)
+    }) %>%
+  tibble::as_tibble_col(column_name = "Item B")
+
+# join
+dplyr::bind_cols(
+  theta = 1:5,
+  hdi_a,
+  hdi_b) %>% 
+  knitr::kable(
+    caption = "Itemごとのthetaの事後分布における95%HDI",
+    label = "comparing-hid-of-theta-between-items"
+  ) %>% 
+  kableExtra::kable_styling(full_width = FALSE)
+```
+
+## 滞在時間をテストする {#02-03-00-visit-time}
+
+ここでは連続値の指標に対して仮設検定をしたい場合を扱っていく．例えば
+
+- ウェブサイトに滞在した秒数
+- 画面の表示領域に入ったウェブサイトのコンテンツの割合
+
+などが考えられる．特にここでは後者を扱う．データについて以下のURLのものを使う．
+
+```{r load-time-on-page} 
+url <- "https://www.oreilly.co.jp/pub/9784873119168/data/time-on-page.csv"
+time_on_page <- read.csv(url) %>% 
+  tidyr::as_tibble() %>% 
+  magrittr::set_colnames("time_on_page")
+str(time_on_page)
+```
+
+このデータセットは１列しかなく，一つのレコードが一回のアクセスの滞在時間となっている．
+このデータの分布のヒストグラムがFig \@ref(histogram-time-on-page) である．
+裾が重い分布になっていて異常に大きな値があることがわかる．
+
+```{r histogram-time-on-page, fig.cap = "アクセスごとの滞在時間のヒストグラム"}
+time_on_page %>% 
+  ggplot() + 
+  geom_histogram(aes(x = time_on_page), binwidth = 30)
+
+```
+
+このような分布は中央値と平均に乖離が大きいことが多い，実際
+
+```{r summary-of-time-on-page}
+time_on_page %>% 
+  dplyr::reframe(n = n(), mean = mean(time_on_page), 
+                 median = median(time_on_page), sd = sd(time_on_page)) %>% 
+  knitr::kable(
+    caption = "time_on_pageの要約統計量",
+    label = "summary-of-time-on-page"
+  ) %>% 
+  kableExtra::kable_styling(full_width = FALSE)
+```
+
+ここでは，滞在時間がパラメータ$\theta$の指数分布に従うとして，ベイズ推論を行う．
+$\theta$の事前分布としては無情報の事前分布の意味で一様分布を採用する．
+
+パラメータ$\theta$の指数分布とは以下の確率密度関数を持つ確率分布である．
+\begin{align}
+p(x|\theta) = \dfrac{\exp(-x/\theta)}{\theta}
+(\#eq:exponential-pdf)
+\end{align}
+
+
+また，モデルとしては以下を考えることになる．
+
+\begin{align}
+\begin{aligned}
+  \theta &\sim \text{Uniform}(0, 3000) \\
+  t &\sim \text{Exponential}(\theta)
+\end{aligned}
+(\#eq:model-for-time-on-page)
+\end{align}
+
+time

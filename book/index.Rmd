@@ -43,7 +43,15 @@ github-repo: https://github.com/masayukeeeee/machine-learning-with-web-optimizat
 
 ```{r import-pkgs, echo=FALSE, message=FALSE, warning=FALSE}
 require(tidyverse)
+require(rstan)
+require(ggmcmc)
+require(glue)
 require(knitr)
+require(kableExtra)
+require(gridExtra)
+require(tidybayes)
+require(bayesplot)
+require(forcats)
 ```
 
 # 概要 {-#00-intro}

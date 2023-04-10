@@ -496,7 +496,7 @@ apply(params, 2, function(e){
 この例では，事後分布が$\alpha = a + 1, \beta = N - a + 1$としたベータ分布として表される．
 
 ```{r 01-06-02-beta-inference, fig.cap="ベータ分布で表現した場合の推論結果"}
-thetas <- thetas <- seq(0.001, 0.999,length=1000)
+thetas <- seq(0.001, 0.999,length=1000)
 
 beta_pdf <- function(alpha, beta, thetas){
   numerator <- thetas ** (alpha - 1) * (1 - thetas) ** (beta - 1)

@@ -2,6 +2,12 @@ require(base)
 require(utils)
 require(yaml)
 
+# install and import rstan
+if(!require(rstan)){
+  install.packages("rstan", repos = "https://cloud.r-project.org/", dependencies = TRUE)
+}
+require(rstan)
+
 # import libraries
 config <- read_yaml("config.yaml")
 pkgs <- config$packages
