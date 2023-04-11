@@ -251,7 +251,7 @@ pb_avg
 ### 推定結果の比較 
 
 最後にItem AとItem Bについて比較をまとめておこう．
-Fig \@ref(comparing-avg-review-score) は既に示した図を縦に並べたものだが
+Fig \@ref(fig:comparing-avg-review-score) は既に示した図を縦に並べたものだが
 この比較で平均レビュースコアがどの程度信頼できるものかを確認できる．
 量的に表す場合，例えば事後分布のサンプルが4以上であるものの割合を計算すれば
 ある意味で平均のスコアが4以上になる確率を推論することができる．
@@ -271,12 +271,13 @@ gridExtra::grid.arrange(
 
 
 
-次に，Fig \@ref(fig:spread_draws-of-items) はthetaの事後分布を比較した図である．
+次に，Figure \@ref(fig:spread_draws-of-items) はthetaの事後分布を比較した図である．
 Item Aの場合，thetaの事後分布の幅が比較的狭くなっておりレビューにおけるそれぞれのスコアで
 評価される確率のブレが少ない一方，Item Bの場合は幅が広くブレが大きいことがわかる．
 特に3と5は広く出ており現時点での平均スコアが4.2という値の信頼性が低いと見做せる．
 
-```{r spread_draws-of-items, fig.cap = "thetaの事後分布の比較", echo = FALSE}
+
+```{r create-spread_draws-of-items, eval=F, echo=F}
 pa <- fit_item_a %>% 
   tidybayes::spread_draws(theta[condition]) %>% 
   ggplot(aes(y = fct_rev(as.factor(condition)), x = theta),) + 
@@ -294,7 +295,17 @@ pb <- fit_item_b %>%
   ylab("") + 
   ggtitle("", subtitle = "Item B")
 
-gridExtra::grid.arrange(pa, pb, nrow=1)
+p <- gridExtra::grid.arrange(pa, pb, nrow=1)
+ggsave(
+  "script/chapter02/spread_draws-of-items.png",
+  plot = p,
+  w = 11, h = 7
+)
+```
+
+
+```{r spread_draws-of-items, fig.cap = "thetaの事後分布の比較", echo = FALSE}
+knitr::include_graphics("script/chapter02/spread_draws-of-items.png")
 ```
 
 最後にTable \@ref(tab:comparing-hid-of-theta-between-items) はthetaの事後分布におけるHDIを比較した表である．
@@ -355,7 +366,7 @@ str(time_on_page)
 ```
 
 このデータセットは１列しかなく，一つのレコードが一回のアクセスの滞在時間となっている．
-このデータの分布のヒストグラムがFig \@ref(histogram-time-on-page) である．
+このデータの分布のヒストグラムがFig \@ref(fig:histogram-time-on-page) である．
 裾が重い分布になっていて異常に大きな値があることがわかる．
 
 ```{r histogram-time-on-page, fig.cap = "アクセスごとの滞在時間のヒストグラム"}
@@ -398,4 +409,94 @@ p(x|\theta) = \dfrac{\exp(-x/\theta)}{\theta}
 (\#eq:model-for-time-on-page)
 \end{align}
 
-time
+### Stanでの推定  
+
+以下のスクリプトで，ベイス推論を実行した．
+
+```
+data {
+  int N;
+  int <lower=0> time_on_page[N];
+}
+
+parameters {
+  real <lower=0, upper=3000> theta;
+}
+
+model {
+  // prior
+  theta ~ uniform(0, 3000);
+  
+  // likelihood
+  for (n in 1:N) {
+    time_on_page[n] ~ exponential(theta);
+  }
+}
+
+```
+
+```{r fit-time-on-page-model, eval=F}
+url <- "https://www.oreilly.co.jp/pub/9784873119168/data/time-on-page.csv"
+time_on_page <- read.csv(url) %>% 
+  tidyr::as_tibble() %>% 
+  magrittr::set_colnames("time_on_page")
+
+data <- list(
+  N = nrow(time_on_page),
+  time_on_page = time_on_page$time_on_page
+)
+
+fit_time_on_page <- rstan::stan(
+  file = "book/script/chapter02/stan/time-on-page-01.stan",
+  data = data,
+  seed = 1234,
+  iter = 2000,
+  chain = 4
+)
+```
+
+Figure \@ref(fig:check-convergence-time-on-page) を見ると，パラメータ$\theta$の推定は問題なく収束していると判断できる．
+
+```{r load-result-time-on-page, eval=F}
+fit_time_on_page <- readRDS("script/chapter02/stan/time-on-page-01.obj")
+```
+
+
+```{r check-convergence-time-on-page, fig.cap="thetaについてのMCMCのトレースプロット"}
+stan_results <- ggmcmc::ggs(fit_time_on_page)
+ggmcmc::ggs_traceplot(stan_results)
+```
+
+次に事後分布を可視化してみる．Figure \@ref(fig:density-time-on-page) が$\theta$の事後分布である．
+200付近を中心に裾が概ね$\pm 50$程度に収まっている．
+
+```{r density-time-on-page, fig.cap = "推定されたthetaの事後分布"}
+ms <- rstan::extract(fit_time_on_page)
+{1/ms$theta} %>% 
+  tibble::as_tibble_col(
+    column_name = "sample-of-theta"
+  ) %>% 
+  ggplot() + 
+  geom_density(aes(x = `sample-of-theta`),
+               fill = "blue", alpha = 0.4)
+```
+```{r hdi-time-on-page}
+fit_time_on_page %>% 
+  rstan::extract() %>% 
+  purrr::pluck("theta") %>% 
+  {1/.} %>% # 1/thetaを計算
+  tidybayes::hdi(ci = 0.95) %>%  # 95%HDI
+  round(3) %>% 
+  as.data.frame() %>% 
+  magrittr::set_colnames(c("lower", "upper")) %>% 
+  knitr::kable(
+    caption = "thetaの事後分布におけるHDI",
+    label = "hdi-time-on-page"
+  )
+```
+
+Table \@ref(tab:hdi-time-on-page) が95%HDIの計算結果である．滞在時間の平均は175 ~ 230程度と判断できる．
+実際はデータの分布を見た通り多くのユーザーはもっと少ない滞在時間となっているが，あくまで平均の推定値としては
+この程度であるということになる．
+
+

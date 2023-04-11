@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>2.2 滞在時間をテストする | ウェブ最適化ではじめる機械学習 in R</title>
   <meta name="description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
-  <meta name="generator" content="bookdown 0.32 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
 
   <meta property="og:title" content="2.2 滞在時間をテストする | ウェブ最適化ではじめる機械学習 in R" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Masayuki Sakai" />
 
 
-<meta name="date" content="2023-04-10" />
+<meta name="date" content="2023-04-11" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -31,7 +31,7 @@
   
   
 <link rel="prev" href="id_02-02-00-review-score.html"/>
-<link rel="next" href="id_99_references.html"/>
+<link rel="next" href="id_03-00-00-test-with-combinations.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -52,7 +52,7 @@
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
-<script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<script src="libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
 <script src="libs/plotly-binding-4.10.1/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
@@ -201,7 +201,25 @@ div.csl-indent {
 <li class="chapter" data-level="2.1.3" data-path="id_02-02-00-review-score.html"><a href="id_02-02-00-review-score.html#item-bについての推論"><i class="fa fa-check"></i><b>2.1.3</b> Item Bについての推論</a></li>
 <li class="chapter" data-level="2.1.4" data-path="id_02-02-00-review-score.html"><a href="id_02-02-00-review-score.html#推定結果の比較"><i class="fa fa-check"></i><b>2.1.4</b> 推定結果の比較</a></li>
 </ul></li>
-<li class="chapter" data-level="2.2" data-path="id_02-03-00-visit-time.html"><a href="id_02-03-00-visit-time.html"><i class="fa fa-check"></i><b>2.2</b> 滞在時間をテストする</a></li>
+<li class="chapter" data-level="2.2" data-path="id_02-03-00-visit-time.html"><a href="id_02-03-00-visit-time.html"><i class="fa fa-check"></i><b>2.2</b> 滞在時間をテストする</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="id_02-03-00-visit-time.html"><a href="id_02-03-00-visit-time.html#stanでの推定"><i class="fa fa-check"></i><b>2.2.1</b> Stanでの推定</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="id_03-00-00-test-with-combinations.html"><a href="id_03-00-00-test-with-combinations.html"><i class="fa fa-check"></i><b>3</b> 組み合わせのあるテスト</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="id_03-01-00-sample-report.html"><a href="id_03-01-00-sample-report.html"><i class="fa fa-check"></i><b>3.1</b> サンプルレポート</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="id_03-01-00-sample-report.html"><a href="id_03-01-00-sample-report.html#id_03-01-01-simple-inference"><i class="fa fa-check"></i><b>3.1.1</b> シンプルなベイズ推論</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="id_03-02-00-modelling-1.html"><a href="id_03-02-00-modelling-1.html"><i class="fa fa-check"></i><b>3.2</b> モデリング1</a></li>
+<li class="chapter" data-level="3.3" data-path="id_03-03-00-ダミー変数.html"><a href="id_03-03-00-ダミー変数.html"><i class="fa fa-check"></i><b>3.3</b> ダミー変数</a></li>
+<li class="chapter" data-level="3.4" data-path="id_03-04-00-logistic-function.html"><a href="id_03-04-00-logistic-function.html"><i class="fa fa-check"></i><b>3.4</b> ロジスティック関数</a></li>
+<li class="chapter" data-level="3.5" data-path="id_03-05-00-normal-distoribution.html"><a href="id_03-05-00-normal-distoribution.html"><i class="fa fa-check"></i><b>3.5</b> 正規分布</a></li>
+<li class="chapter" data-level="3.6" data-path="id_03-06-00-modelling-2.html"><a href="id_03-06-00-modelling-2.html"><i class="fa fa-check"></i><b>3.6</b> モデリング2</a></li>
+<li class="chapter" data-level="3.7" data-path="id_03-07-00-wrong-model.html"><a href="id_03-07-00-wrong-model.html"><i class="fa fa-check"></i><b>3.7</b> 間違ったモデル</a></li>
+<li class="chapter" data-level="3.8" data-path="id_03-08-00-interaction.html"><a href="id_03-08-00-interaction.html"><i class="fa fa-check"></i><b>3.8</b> 交互作用</a></li>
+<li class="chapter" data-level="3.9" data-path="id_03-09-00-summary.html"><a href="id_03-09-00-summary.html"><i class="fa fa-check"></i><b>3.9</b> まとめ</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="id_99_references.html"><a href="id_99_references.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
@@ -232,19 +250,19 @@ div.csl-indent {
 <li>画面の表示領域に入ったウェブサイトのコンテンツの割合</li>
 </ul>
 <p>などが考えられる．特にここでは後者を扱う．データについて以下のURLのものを使う．</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="id_02-03-00-visit-time.html#cb35-1" aria-hidden="true" tabindex="-1"></a>url <span class="ot">&lt;-</span> <span class="st">&quot;https://www.oreilly.co.jp/pub/9784873119168/data/time-on-page.csv&quot;</span></span>
-<span id="cb35-2"><a href="id_02-03-00-visit-time.html#cb35-2" aria-hidden="true" tabindex="-1"></a>time_on_page <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(url) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-3"><a href="id_02-03-00-visit-time.html#cb35-3" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb35-4"><a href="id_02-03-00-visit-time.html#cb35-4" aria-hidden="true" tabindex="-1"></a>  magrittr<span class="sc">::</span><span class="fu">set_colnames</span>(<span class="st">&quot;time_on_page&quot;</span>)</span>
-<span id="cb35-5"><a href="id_02-03-00-visit-time.html#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(time_on_page)</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="id_02-03-00-visit-time.html#cb34-1" aria-hidden="true" tabindex="-1"></a>url <span class="ot">&lt;-</span> <span class="st">&quot;https://www.oreilly.co.jp/pub/9784873119168/data/time-on-page.csv&quot;</span></span>
+<span id="cb34-2"><a href="id_02-03-00-visit-time.html#cb34-2" aria-hidden="true" tabindex="-1"></a>time_on_page <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(url) <span class="sc">%&gt;%</span> </span>
+<span id="cb34-3"><a href="id_02-03-00-visit-time.html#cb34-3" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb34-4"><a href="id_02-03-00-visit-time.html#cb34-4" aria-hidden="true" tabindex="-1"></a>  magrittr<span class="sc">::</span><span class="fu">set_colnames</span>(<span class="st">&quot;time_on_page&quot;</span>)</span>
+<span id="cb34-5"><a href="id_02-03-00-visit-time.html#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(time_on_page)</span></code></pre></div>
 <pre><code>## tibble [222 × 1] (S3: tbl_df/tbl/data.frame)
 ##  $ time_on_page: int [1:222] 178 4 112 576 419 41 93 10 59 87 ...</code></pre>
 <p>このデータセットは１列しかなく，一つのレコードが一回のアクセスの滞在時間となっている．
-このデータの分布のヒストグラムがFig <a href="#histogram-time-on-page"><strong>??</strong></a> である．
+このデータの分布のヒストグラムがFig <a href="id_02-03-00-visit-time.html#fig:histogram-time-on-page">2.6</a> である．
 裾が重い分布になっていて異常に大きな値があることがわかる．</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="id_02-03-00-visit-time.html#cb37-1" aria-hidden="true" tabindex="-1"></a>time_on_page <span class="sc">%&gt;%</span> </span>
-<span id="cb37-2"><a href="id_02-03-00-visit-time.html#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
-<span id="cb37-3"><a href="id_02-03-00-visit-time.html#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> time_on_page), <span class="at">binwidth =</span> <span class="dv">30</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="id_02-03-00-visit-time.html#cb36-1" aria-hidden="true" tabindex="-1"></a>time_on_page <span class="sc">%&gt;%</span> </span>
+<span id="cb36-2"><a href="id_02-03-00-visit-time.html#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb36-3"><a href="id_02-03-00-visit-time.html#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> time_on_page), <span class="at">binwidth =</span> <span class="dv">30</span>)</span></code></pre></div>
 <div class="figure"><span style="display:block;" id="fig:histogram-time-on-page"></span>
 <img src="_main_files/figure-html/histogram-time-on-page-1.png" alt="アクセスごとの滞在時間のヒストグラム" width="672" />
 <p class="caption">
@@ -252,14 +270,14 @@ Figure 2.6: アクセスごとの滞在時間のヒストグラム
 </p>
 </div>
 <p>このような分布は中央値と平均に乖離が大きいことが多い，実際</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="id_02-03-00-visit-time.html#cb38-1" aria-hidden="true" tabindex="-1"></a>time_on_page <span class="sc">%&gt;%</span> </span>
-<span id="cb38-2"><a href="id_02-03-00-visit-time.html#cb38-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">reframe</span>(<span class="at">n =</span> <span class="fu">n</span>(), <span class="at">mean =</span> <span class="fu">mean</span>(time_on_page), </span>
-<span id="cb38-3"><a href="id_02-03-00-visit-time.html#cb38-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">median =</span> <span class="fu">median</span>(time_on_page), <span class="at">sd =</span> <span class="fu">sd</span>(time_on_page)) <span class="sc">%&gt;%</span> </span>
-<span id="cb38-4"><a href="id_02-03-00-visit-time.html#cb38-4" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
-<span id="cb38-5"><a href="id_02-03-00-visit-time.html#cb38-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;time_on_pageの要約統計量&quot;</span>,</span>
-<span id="cb38-6"><a href="id_02-03-00-visit-time.html#cb38-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="st">&quot;summary-of-time-on-page&quot;</span></span>
-<span id="cb38-7"><a href="id_02-03-00-visit-time.html#cb38-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb38-8"><a href="id_02-03-00-visit-time.html#cb38-8" aria-hidden="true" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="id_02-03-00-visit-time.html#cb37-1" aria-hidden="true" tabindex="-1"></a>time_on_page <span class="sc">%&gt;%</span> </span>
+<span id="cb37-2"><a href="id_02-03-00-visit-time.html#cb37-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">reframe</span>(<span class="at">n =</span> <span class="fu">n</span>(), <span class="at">mean =</span> <span class="fu">mean</span>(time_on_page), </span>
+<span id="cb37-3"><a href="id_02-03-00-visit-time.html#cb37-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">median =</span> <span class="fu">median</span>(time_on_page), <span class="at">sd =</span> <span class="fu">sd</span>(time_on_page)) <span class="sc">%&gt;%</span> </span>
+<span id="cb37-4"><a href="id_02-03-00-visit-time.html#cb37-4" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb37-5"><a href="id_02-03-00-visit-time.html#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;time_on_pageの要約統計量&quot;</span>,</span>
+<span id="cb37-6"><a href="id_02-03-00-visit-time.html#cb37-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="st">&quot;summary-of-time-on-page&quot;</span></span>
+<span id="cb37-7"><a href="id_02-03-00-visit-time.html#cb37-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb37-8"><a href="id_02-03-00-visit-time.html#cb37-8" aria-hidden="true" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
 <span id="tab:summary-of-time-on-page">Table 2.6: </span>time_on_pageの要約統計量
@@ -312,8 +330,113 @@ p(x|\theta) = \dfrac{\exp(-x/\theta)}{\theta}
 \end{aligned}
 \tag{2.5}
 \end{align}\]</span></p>
-<p>time</p>
+<div id="stanでの推定" class="section level3 hasAnchor" number="2.2.1">
+<h3><span class="header-section-number">2.2.1</span> Stanでの推定<a href="id_02-03-00-visit-time.html#stanでの推定" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>以下のスクリプトで，ベイス推論を実行した．</p>
+<pre><code>data {
+  int N;
+  int &lt;lower=0&gt; time_on_page[N];
+}
 
+parameters {
+  real &lt;lower=0, upper=3000&gt; theta;
+}
+
+model {
+  // prior
+  theta ~ uniform(0, 3000);
+  
+  // likelihood
+  for (n in 1:N) {
+    time_on_page[n] ~ exponential(theta);
+  }
+}
+</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="id_02-03-00-visit-time.html#cb39-1" aria-hidden="true" tabindex="-1"></a>url <span class="ot">&lt;-</span> <span class="st">&quot;https://www.oreilly.co.jp/pub/9784873119168/data/time-on-page.csv&quot;</span></span>
+<span id="cb39-2"><a href="id_02-03-00-visit-time.html#cb39-2" aria-hidden="true" tabindex="-1"></a>time_on_page <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(url) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-3"><a href="id_02-03-00-visit-time.html#cb39-3" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb39-4"><a href="id_02-03-00-visit-time.html#cb39-4" aria-hidden="true" tabindex="-1"></a>  magrittr<span class="sc">::</span><span class="fu">set_colnames</span>(<span class="st">&quot;time_on_page&quot;</span>)</span>
+<span id="cb39-5"><a href="id_02-03-00-visit-time.html#cb39-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-6"><a href="id_02-03-00-visit-time.html#cb39-6" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb39-7"><a href="id_02-03-00-visit-time.html#cb39-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">N =</span> <span class="fu">nrow</span>(time_on_page),</span>
+<span id="cb39-8"><a href="id_02-03-00-visit-time.html#cb39-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_on_page =</span> time_on_page<span class="sc">$</span>time_on_page</span>
+<span id="cb39-9"><a href="id_02-03-00-visit-time.html#cb39-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb39-10"><a href="id_02-03-00-visit-time.html#cb39-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-11"><a href="id_02-03-00-visit-time.html#cb39-11" aria-hidden="true" tabindex="-1"></a>fit_time_on_page <span class="ot">&lt;-</span> rstan<span class="sc">::</span><span class="fu">stan</span>(</span>
+<span id="cb39-12"><a href="id_02-03-00-visit-time.html#cb39-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;book/script/chapter02/stan/time-on-page-01.stan&quot;</span>,</span>
+<span id="cb39-13"><a href="id_02-03-00-visit-time.html#cb39-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data,</span>
+<span id="cb39-14"><a href="id_02-03-00-visit-time.html#cb39-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">1234</span>,</span>
+<span id="cb39-15"><a href="id_02-03-00-visit-time.html#cb39-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">2000</span>,</span>
+<span id="cb39-16"><a href="id_02-03-00-visit-time.html#cb39-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">chain =</span> <span class="dv">4</span></span>
+<span id="cb39-17"><a href="id_02-03-00-visit-time.html#cb39-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Figure <a href="id_02-03-00-visit-time.html#fig:check-convergence-time-on-page">2.7</a> を見ると，パラメータ<span class="math inline">\(\theta\)</span>の推定は問題なく収束していると判断できる．</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="id_02-03-00-visit-time.html#cb40-1" aria-hidden="true" tabindex="-1"></a>fit_time_on_page <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;script/chapter02/stan/time-on-page-01.obj&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="id_02-03-00-visit-time.html#cb41-1" aria-hidden="true" tabindex="-1"></a>stan_results <span class="ot">&lt;-</span> ggmcmc<span class="sc">::</span><span class="fu">ggs</span>(fit_time_on_page)</span>
+<span id="cb41-2"><a href="id_02-03-00-visit-time.html#cb41-2" aria-hidden="true" tabindex="-1"></a>ggmcmc<span class="sc">::</span><span class="fu">ggs_traceplot</span>(stan_results)</span></code></pre></div>
+<div class="figure"><span style="display:block;" id="fig:check-convergence-time-on-page"></span>
+<img src="_main_files/figure-html/check-convergence-time-on-page-1.png" alt="thetaについてのMCMCのトレースプロット" width="672" />
+<p class="caption">
+Figure 2.7: thetaについてのMCMCのトレースプロット
+</p>
+</div>
+<p>次に事後分布を可視化してみる．Figure <a href="id_02-03-00-visit-time.html#fig:density-time-on-page">2.8</a> が<span class="math inline">\(\theta\)</span>の事後分布である．
+200付近を中心に裾が概ね<span class="math inline">\(\pm 50\)</span>程度に収まっている．</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="id_02-03-00-visit-time.html#cb42-1" aria-hidden="true" tabindex="-1"></a>ms <span class="ot">&lt;-</span> rstan<span class="sc">::</span><span class="fu">extract</span>(fit_time_on_page)</span>
+<span id="cb42-2"><a href="id_02-03-00-visit-time.html#cb42-2" aria-hidden="true" tabindex="-1"></a>{<span class="dv">1</span><span class="sc">/</span>ms<span class="sc">$</span>theta} <span class="sc">%&gt;%</span> </span>
+<span id="cb42-3"><a href="id_02-03-00-visit-time.html#cb42-3" aria-hidden="true" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">as_tibble_col</span>(</span>
+<span id="cb42-4"><a href="id_02-03-00-visit-time.html#cb42-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">column_name =</span> <span class="st">&quot;sample-of-theta&quot;</span></span>
+<span id="cb42-5"><a href="id_02-03-00-visit-time.html#cb42-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb42-6"><a href="id_02-03-00-visit-time.html#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb42-7"><a href="id_02-03-00-visit-time.html#cb42-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">sample-of-theta</span><span class="st">`</span>),</span>
+<span id="cb42-8"><a href="id_02-03-00-visit-time.html#cb42-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">fill =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>)</span></code></pre></div>
+<div class="figure"><span style="display:block;" id="fig:density-time-on-page"></span>
+<img src="_main_files/figure-html/density-time-on-page-1.png" alt="推定されたthetaの事後分布" width="672" />
+<p class="caption">
+Figure 2.8: 推定されたthetaの事後分布
+</p>
+</div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="id_02-03-00-visit-time.html#cb43-1" aria-hidden="true" tabindex="-1"></a>fit_time_on_page <span class="sc">%&gt;%</span> </span>
+<span id="cb43-2"><a href="id_02-03-00-visit-time.html#cb43-2" aria-hidden="true" tabindex="-1"></a>  rstan<span class="sc">::</span><span class="fu">extract</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb43-3"><a href="id_02-03-00-visit-time.html#cb43-3" aria-hidden="true" tabindex="-1"></a>  purrr<span class="sc">::</span><span class="fu">pluck</span>(<span class="st">&quot;theta&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb43-4"><a href="id_02-03-00-visit-time.html#cb43-4" aria-hidden="true" tabindex="-1"></a>  {<span class="dv">1</span><span class="sc">/</span>.} <span class="sc">%&gt;%</span> <span class="co"># 1/thetaを計算</span></span>
+<span id="cb43-5"><a href="id_02-03-00-visit-time.html#cb43-5" aria-hidden="true" tabindex="-1"></a>  tidybayes<span class="sc">::</span><span class="fu">hdi</span>(<span class="at">ci =</span> <span class="fl">0.95</span>) <span class="sc">%&gt;%</span>  <span class="co"># 95%HDI</span></span>
+<span id="cb43-6"><a href="id_02-03-00-visit-time.html#cb43-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">round</span>(<span class="dv">3</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb43-7"><a href="id_02-03-00-visit-time.html#cb43-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb43-8"><a href="id_02-03-00-visit-time.html#cb43-8" aria-hidden="true" tabindex="-1"></a>  magrittr<span class="sc">::</span><span class="fu">set_colnames</span>(<span class="fu">c</span>(<span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb43-9"><a href="id_02-03-00-visit-time.html#cb43-9" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb43-10"><a href="id_02-03-00-visit-time.html#cb43-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;thetaの事後分布におけるHDI&quot;</span>,</span>
+<span id="cb43-11"><a href="id_02-03-00-visit-time.html#cb43-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="st">&quot;hdi-time-on-page&quot;</span></span>
+<span id="cb43-12"><a href="id_02-03-00-visit-time.html#cb43-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<table>
+<caption>
+<span id="tab:hdi-time-on-page">Table 2.7: </span>thetaの事後分布におけるHDI
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+lower
+</th>
+<th style="text-align:right;">
+upper
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+175.052
+</td>
+<td style="text-align:right;">
+230.135
+</td>
+</tr>
+</tbody>
+</table>
+<p>Table <a href="id_02-03-00-visit-time.html#tab:hdi-time-on-page">2.7</a> が95%HDIの計算結果である．滞在時間の平均は175 ~ 230程度と判断できる．
+実際はデータの分布を見た通り多くのユーザーはもっと少ない滞在時間となっているが，あくまで平均の推定値としては
+この程度であるということになる．</p>
+
+</div>
 </div>
 <!-- </div> -->
             </section>
@@ -322,7 +445,7 @@ p(x|\theta) = \dfrac{\exp(-x/\theta)}{\theta}
         </div>
       </div>
 <a href="id_02-02-00-review-score.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="id_99_references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="id_03-00-00-test-with-combinations.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

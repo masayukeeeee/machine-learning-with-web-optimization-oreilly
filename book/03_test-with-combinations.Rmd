@@ -1,0 +1,222 @@
+# 組み合わせのあるテスト {#03-00-00-test-with-combinations}
+
+一般にウェブサイトでは写真・テキスト・ボタンなどの要素の集合であり
+それぞれが同時にユーザーに影響を与えているはずだ．
+
+このような場合において，扱いたい要素それぞれの影響を考慮した分析・A/Bテストが必要になる．
+ここではこのテーマを扱っていこう．
+
+## サンプルレポート {#03-01-00-sample-report}
+
+まず以下のような状況を考えよう．
+
+1. ある商品のプロモーションのためにLPを作成した
+1. LPのデザインパターンとして以下を作成した
+  1. ヒーローバナーを２パターン
+  1. ボタンの文言を２パターン
+1. これらのデザインをそれぞれ無作為にユーザーに表示させてデータを収集した
+
+この実験によって得られたデータが以下のようなものだったとする．
+
+```{r create-sample-data-chapter-03, echo=FALSE}
+save_path <- "dataset/chapter03/test-results.csv"
+test_results <- tibble::tibble(
+  pattern = c(LETTERS[1:4]),
+  imp = c(434, 382, 394, 88),
+  click = c(8, 17, 10, 4)
+) %>% 
+  mutate(ctr = click / imp)
+
+write.csv(test_results, save_path, row.names = FALSE)
+```
+
+```{r load-sample-data-chapter-03}
+test_results <- read_csv("dataset/chapter03/test-results.csv")
+test_results %>%
+  mutate(ctr = round(ctr, 4)) %>% 
+  knitr::kable(
+    caption = "LPのデザイン表示テスト結果",
+    label = "sample-data-chapter-03"
+  ) %>% 
+  kableExtra::kable_styling(full_width = FALSE)
+```
+
+\@ref(tab:sample-data-chapter-03) を見るとパターンDの表示回数が少なくなっている．これは表示のロジックにバグがあったためということにしておく．
+均等配信ができなかった状態で議論を進めていこう．
+
+### シンプルなベイズ推論 {#03-01-01-simple-inference}
+
+要素については一度忘れて既にやった通り表示とクリック数で二項分布を当てはめるベイズ推論を行ってみよう．
+つまりEquation \@ref(eq:simple-binomial-model) のようなモデルを考える．
+
+\begin{align}
+\begin{aligned}
+  \text{Click} \sim \text{Binomial}(Impression, \theta)
+\end{aligned}
+  (\#eq:simple-binomial-model)
+\end{align}
+
+Stanのコードはこのようになる．
+
+```
+data {
+  int N;
+  int<lower=0> imp[N];
+  int<lower=0> click[N];
+}
+
+parameters {
+  real<lower=0, upper=1> theta[N] ;
+}
+
+model {
+  for (n in 1:N) {
+    click[n] ~ binomial(imp[n], theta[n]);
+  }
+}
+```
+
+Rの実行コードは以下のようにした．
+
+```{r chap03-fit-stan-simple-01, eval=F}
+df <- test_results
+
+data <- list(
+  N = nrow(df),
+  imp = df$imp,
+  click = df$click
+)
+
+fit_simple_model <- rstan::stan(
+  file = model_path,
+  data = data,
+  iter = 4000,
+  chain = 4,
+  seed = 1234
+)
+```
+
+```{r load-result-chap03-fit-stan-simple-01, echo=F}
+fit_simple_model <- readRDS(file = "script/chapter03/simple-obj")
+```
+
+トレースプロット Figure \@ref(fig:traceplot-chap03-simple-01) を確認すると，問題なく収束していることが確認できる．
+
+```{r traceplot-chap03-simple-01, fig.cap = "thetaのMCMCのトレースプロット"}
+ggmcmc::ggs(fit_simple_model) %>% 
+  ggmcmc::ggs_traceplot()
+```
+
+次に推定された事後分布とその要約を確認しておこう．これらをTable \@ref(tab:summary-fit-simple-01) にまとめる．
+
+```{r summary-fit-simple-01, echo=F}
+fit_simple_model %>% 
+  rstan::extract() %>% 
+  purrr::pluck("theta") %>% 
+  as.data.frame() %>% 
+  magrittr::set_colnames(
+    paste("theta", c("A","B","C","D"), sep = "_")
+  ) %>% 
+  apply(2, function(x) {
+    hdi_value <- hdi(x, 0.95)
+    names(hdi_value) <- c("lower", "upper")
+    res <- c(mean=mean(x), sd=sd(x), hdi_value)
+    return(res)
+  }) %>% 
+  t() %>% 
+  round(3) %>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column("parameter") %>% 
+  tibble::as_tibble() %>% 
+  mutate(
+    hid_range = upper - lower
+  ) %>% 
+  knitr::kable(
+    caption = "thetaの事後分布の要約",
+    label = "summary-fit-simple-01"
+  ) %>% 
+  kableExtra::kable_styling(full_width = FALSE)
+```
+また，事後分布の形状をFigure \@ref(fig:posterior-theta-simple-01) にまとめた．
+
+```{r posterior-theta-simple-01, fig.cap = "各パターンに対するthetaの事後分布"}
+fit_simple_model %>% 
+  tidybayes::spread_draws(theta[condition]) %>% 
+  mutate(
+    condition = as.factor(c("A", "B", "C", "D")[condition])
+  ) %>% 
+  ggplot(aes(y = fct_rev(condition), x = theta),) + 
+  tidybayes::stat_halfeye(.width = c(.90, .5), fill = "skyblue") + 
+  xlim(0, 0.18) +
+  ylab("theta") + 
+  xlab("density")
+```
+
+平均を見るとA案が最もCTRが低く，D案が最もCTRが広いがDは表示回数が少ないため事後分布の裾が広くなっている．
+これよりB案とD案に絞り，これらの案が他より優れているかどうかを評価してみる．
+
+```{r table-comparing-simple-model-bd-to-ac}
+ms <- rstan::extract(fit_simple_model) %>% 
+  purrr::pluck("theta")
+
+tibble(
+  Pattern = c("A", "C"),
+  "B" = c(mean(ms[,2] - ms[,1] > 0), mean(ms[,2] - ms[,3] > 0)) %>% round(3),
+  "D" = c(mean(ms[,4] - ms[,1] > 0), mean(ms[,4] - ms[,3] > 0)) %>% round(3)
+) %>% 
+  knitr::kable(
+    caption = "B,D案とA,C案の比較",
+    label = "comparing-simple-model-bd-to-ac"
+  )
+```
+B案がA案よりも優れている割合は95%を超えているものの，D案とA案の比較では95%を若干下回っている．
+
+## モデリング1 {#03-02-00-modelling-1}
+
+要素案の効果を考慮するために以下のようなEquation \@ref(eq:chap03-model-02) で定義されるモデルがより適切として議論を進める．
+
+\begin{align}
+\begin{aligned}
+  \alpha &\sim N(\mu_0, \sigma_0) \\
+  \beta_{\text{banner}} &\sim N(\mu_1, \sigma_1) \\
+  \beta_{\text{button}} &\sim N(\mu_2, \sigma_2) \\
+  \theta &= \text{logistic}(\alpha + \beta_1 + \beta_2) \\
+  \text{Click} &\sim \text{Binomial}(\text{Impression}, \theta)
+\end{aligned}
+(\#eq:chap03-model-02)
+\end{align}
+
+ここではデザインで変更を加えた要素に関する情報をダミー変数として持たせ，その効果をモデルに加えている．
+対応してダミー変数をデータに加えておく．
+
+```{r}
+test_results_2 <- test_results %>%
+  mutate(ctr = round(ctr, 4)) %>% 
+  mutate(
+    img = c(0, 0, 1, 1),
+    btn = c(0, 1, 0, 1)
+  ) %>% 
+  select(pattern, img, btn, everything())
+
+test_results_2 %>% 
+  knitr::kable(
+    caption = "LPのデザイン表示テスト結果",
+    label = "sample-data-chapter-03"
+  ) %>% 
+  kableExtra::kable_styling(full_width = FALSE)
+```
+
+
+## ダミー変数 {#03-03-00-ダミー変数}
+
+## ロジスティック関数 {#03-04-00-logistic-function}
+
+## 正規分布 {#03-05-00-normal-distoribution}
+
+## モデリング2 {#03-06-00-modelling-2}
+
+## 間違ったモデル {#03-07-00-wrong-model}
+
+## 交互作用 {#03-08-00-interaction}
+
+## まとめ {#03-09-00-summary}

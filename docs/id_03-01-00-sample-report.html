@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>3.1 サンプルレポート | ウェブ最適化ではじめる機械学習 in R</title>
+  <meta name="description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
+  <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="3.1 サンプルレポート | ウェブ最適化ではじめる機械学習 in R" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
+  <meta name="github-repo" content="https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="3.1 サンプルレポート | ウェブ最適化ではじめる機械学習 in R" />
+  
+  <meta name="twitter:description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
+  
+
+<meta name="author" content="Masayuki Sakai" />
+
+
+<meta name="date" content="2023-04-11" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="id_03-00-00-test-with-combinations.html"/>
+<link rel="next" href="id_03-02-00-modelling-1.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<script src="libs/plotly-binding-4.10.1/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">ウェブ最適化ではじめる機械学習 in R</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>概要</a></li>
+<li class="chapter" data-level="1" data-path="id_01-intro.html"><a href="id_01-intro.html"><i class="fa fa-check"></i><b>1</b> A/Bテストから始めよう：ベイズ統計による仮説検定入門</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="id_01-01-situation.html"><a href="id_01-01-situation.html"><i class="fa fa-check"></i><b>1.1</b> 状況設定</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="id_01-01-situation.html"><a href="id_01-01-situation.html#データ生成のプロセス"><i class="fa fa-check"></i><b>1.1.1</b> データ生成のプロセス</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="id_01-02-pdf-approximation.html"><a href="id_01-02-pdf-approximation.html"><i class="fa fa-check"></i><b>1.2</b> 離散化による確率密度関数の近似</a></li>
+<li class="chapter" data-level="1.3" data-path="id_01-03-additve-and-multiplication-theorem.html"><a href="id_01-03-additve-and-multiplication-theorem.html"><i class="fa fa-check"></i><b>1.3</b> 加法定理・乗法定理</a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="id_01-03-additve-and-multiplication-theorem.html"><a href="id_01-03-additve-and-multiplication-theorem.html#周辺化周辺分布"><i class="fa fa-check"></i><b>1.3.1</b> 周辺化・周辺分布</a></li>
+<li class="chapter" data-level="1.3.2" data-path="id_01-03-additve-and-multiplication-theorem.html"><a href="id_01-03-additve-and-multiplication-theorem.html#連続値の場合"><i class="fa fa-check"></i><b>1.3.2</b> 連続値の場合</a></li>
+<li class="chapter" data-level="1.3.3" data-path="id_01-03-additve-and-multiplication-theorem.html"><a href="id_01-03-additve-and-multiplication-theorem.html#ベイズの定理"><i class="fa fa-check"></i><b>1.3.3</b> ベイズの定理</a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="id_01-04-bayse-inference.html"><a href="id_01-04-bayse-inference.html"><i class="fa fa-check"></i><b>1.4</b> ベイズの定理を使ったクリック率の推論</a></li>
+<li class="chapter" data-level="1.5" data-path="id_01-05-implementation-in-r.html"><a href="id_01-05-implementation-in-r.html"><i class="fa fa-check"></i><b>1.5</b> Rでの実装</a></li>
+<li class="chapter" data-level="1.6" data-path="id_01-06-bayse-inference-with-reports.html"><a href="id_01-06-bayse-inference-with-reports.html"><i class="fa fa-check"></i><b>1.6</b> レポートデータを用いた推論</a></li>
+<li class="chapter" data-level="1.7" data-path="id_01-06-02-beta-distribution.html"><a href="id_01-06-02-beta-distribution.html"><i class="fa fa-check"></i><b>1.7</b> 別解:ベータ分布</a></li>
+<li class="chapter" data-level="1.8" data-path="id_01-07-decision-making.html"><a href="id_01-07-decision-making.html"><i class="fa fa-check"></i><b>1.8</b> 事後分布から決断を下す</a>
+<ul>
+<li class="chapter" data-level="1.8.1" data-path="id_01-07-decision-making.html"><a href="id_01-07-decision-making.html#id_01-07-01-statistics"><i class="fa fa-check"></i><b>1.8.1</b> 要約統計量</a></li>
+<li class="chapter" data-level="1.8.2" data-path="id_01-07-decision-making.html"><a href="id_01-07-decision-making.html#id_01-07-test-with-hdi"><i class="fa fa-check"></i><b>1.8.2</b> HDIをつかった仮設検定</a></li>
+</ul></li>
+<li class="chapter" data-level="1.9" data-path="id_01-08-introduce-new-random-variable.html"><a href="id_01-08-introduce-new-random-variable.html"><i class="fa fa-check"></i><b>1.9</b> 新たな確率変数を導入する</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="id_02-00-00-inference-with-rstan.html"><a href="id_02-00-00-inference-with-rstan.html"><i class="fa fa-check"></i><b>2</b> RStanを使った推論</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="id_02-02-00-review-score.html"><a href="id_02-02-00-review-score.html"><i class="fa fa-check"></i><b>2.1</b> 真のレビュースコア</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="id_02-02-00-review-score.html"><a href="id_02-02-00-review-score.html#ディリクレ分布による事前分布"><i class="fa fa-check"></i><b>2.1.1</b> ディリクレ分布による事前分布</a></li>
+<li class="chapter" data-level="2.1.2" data-path="id_02-02-00-review-score.html"><a href="id_02-02-00-review-score.html#推論の実行"><i class="fa fa-check"></i><b>2.1.2</b> 推論の実行</a></li>
+<li class="chapter" data-level="2.1.3" data-path="id_02-02-00-review-score.html"><a href="id_02-02-00-review-score.html#item-bについての推論"><i class="fa fa-check"></i><b>2.1.3</b> Item Bについての推論</a></li>
+<li class="chapter" data-level="2.1.4" data-path="id_02-02-00-review-score.html"><a href="id_02-02-00-review-score.html#推定結果の比較"><i class="fa fa-check"></i><b>2.1.4</b> 推定結果の比較</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="id_02-03-00-visit-time.html"><a href="id_02-03-00-visit-time.html"><i class="fa fa-check"></i><b>2.2</b> 滞在時間をテストする</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="id_02-03-00-visit-time.html"><a href="id_02-03-00-visit-time.html#stanでの推定"><i class="fa fa-check"></i><b>2.2.1</b> Stanでの推定</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="id_03-00-00-test-with-combinations.html"><a href="id_03-00-00-test-with-combinations.html"><i class="fa fa-check"></i><b>3</b> 組み合わせのあるテスト</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="id_03-01-00-sample-report.html"><a href="id_03-01-00-sample-report.html"><i class="fa fa-check"></i><b>3.1</b> サンプルレポート</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="id_03-01-00-sample-report.html"><a href="id_03-01-00-sample-report.html#id_03-01-01-simple-inference"><i class="fa fa-check"></i><b>3.1.1</b> シンプルなベイズ推論</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="id_03-02-00-modelling-1.html"><a href="id_03-02-00-modelling-1.html"><i class="fa fa-check"></i><b>3.2</b> モデリング1</a></li>
+<li class="chapter" data-level="3.3" data-path="id_03-03-00-ダミー変数.html"><a href="id_03-03-00-ダミー変数.html"><i class="fa fa-check"></i><b>3.3</b> ダミー変数</a></li>
+<li class="chapter" data-level="3.4" data-path="id_03-04-00-logistic-function.html"><a href="id_03-04-00-logistic-function.html"><i class="fa fa-check"></i><b>3.4</b> ロジスティック関数</a></li>
+<li class="chapter" data-level="3.5" data-path="id_03-05-00-normal-distoribution.html"><a href="id_03-05-00-normal-distoribution.html"><i class="fa fa-check"></i><b>3.5</b> 正規分布</a></li>
+<li class="chapter" data-level="3.6" data-path="id_03-06-00-modelling-2.html"><a href="id_03-06-00-modelling-2.html"><i class="fa fa-check"></i><b>3.6</b> モデリング2</a></li>
+<li class="chapter" data-level="3.7" data-path="id_03-07-00-wrong-model.html"><a href="id_03-07-00-wrong-model.html"><i class="fa fa-check"></i><b>3.7</b> 間違ったモデル</a></li>
+<li class="chapter" data-level="3.8" data-path="id_03-08-00-interaction.html"><a href="id_03-08-00-interaction.html"><i class="fa fa-check"></i><b>3.8</b> 交互作用</a></li>
+<li class="chapter" data-level="3.9" data-path="id_03-09-00-summary.html"><a href="id_03-09-00-summary.html"><i class="fa fa-check"></i><b>3.9</b> まとめ</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="id_99_references.html"><a href="id_99_references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io" target="blank">GitHub repository</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">ウェブ最適化ではじめる機械学習 in R</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="id_03-01-00-sample-report" class="section level2 hasAnchor" number="3.1">
+<h2><span class="header-section-number">3.1</span> サンプルレポート<a href="id_03-01-00-sample-report.html#id_03-01-00-sample-report" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>まず以下のような状況を考えよう．</p>
+<ol style="list-style-type: decimal">
+<li>ある商品のプロモーションのためにLPを作成した</li>
+<li>LPのデザインパターンとして以下を作成した</li>
+<li>ヒーローバナーを２パターン</li>
+<li>ボタンの文言を２パターン</li>
+<li>これらのデザインをそれぞれ無作為にユーザーに表示させてデータを収集した</li>
+</ol>
+<p>この実験によって得られたデータが以下のようなものだったとする．</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="id_03-01-00-sample-report.html#cb44-1" aria-hidden="true" tabindex="-1"></a>test_results <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;dataset/chapter03/test-results.csv&quot;</span>)</span></code></pre></div>
+<pre><code>## Rows: 4 Columns: 4
+## ── Column specification ─────────────────────────────────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (1): pattern
+## dbl (3): imp, click, ctr
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="id_03-01-00-sample-report.html#cb46-1" aria-hidden="true" tabindex="-1"></a>test_results <span class="sc">%&gt;%</span></span>
+<span id="cb46-2"><a href="id_03-01-00-sample-report.html#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ctr =</span> <span class="fu">round</span>(ctr, <span class="dv">4</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb46-3"><a href="id_03-01-00-sample-report.html#cb46-3" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb46-4"><a href="id_03-01-00-sample-report.html#cb46-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;LPのデザイン表示テスト結果&quot;</span>,</span>
+<span id="cb46-5"><a href="id_03-01-00-sample-report.html#cb46-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="st">&quot;sample-data-chapter-03&quot;</span></span>
+<span id="cb46-6"><a href="id_03-01-00-sample-report.html#cb46-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb46-7"><a href="id_03-01-00-sample-report.html#cb46-7" aria-hidden="true" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:sample-data-chapter-03">Table 3.1: </span>LPのデザイン表示テスト結果
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+pattern
+</th>
+<th style="text-align:right;">
+imp
+</th>
+<th style="text-align:right;">
+click
+</th>
+<th style="text-align:right;">
+ctr
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:right;">
+434
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+0.0184
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B
+</td>
+<td style="text-align:right;">
+382
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+0.0445
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+C
+</td>
+<td style="text-align:right;">
+394
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+0.0254
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+D
+</td>
+<td style="text-align:right;">
+88
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+0.0455
+</td>
+</tr>
+</tbody>
+</table>
+<p><a href="id_03-01-00-sample-report.html#tab:sample-data-chapter-03">3.1</a> を見るとパターンDの表示回数が少なくなっている．これは表示のロジックにバグがあったためということにしておく．
+均等配信ができなかった状態で議論を進めていこう．</p>
+<div id="id_03-01-01-simple-inference" class="section level3 hasAnchor" number="3.1.1">
+<h3><span class="header-section-number">3.1.1</span> シンプルなベイズ推論<a href="id_03-01-00-sample-report.html#id_03-01-01-simple-inference" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>要素については一度忘れて既にやった通り表示とクリック数で二項分布を当てはめるベイズ推論を行ってみよう．
+つまりEquation <a href="id_03-01-00-sample-report.html#eq:simple-binomial-model">(3.1)</a> のようなモデルを考える．</p>
+<p><span class="math display" id="eq:simple-binomial-model">\[\begin{align}
+\begin{aligned}
+  \text{Click} \sim \text{Binomial}(Impression, \theta)
+\end{aligned}
+  \tag{3.1}
+\end{align}\]</span></p>
+<p>Stanのコードはこのようになる．</p>
+<pre><code>data {
+  int N;
+  int&lt;lower=0&gt; imp[N];
+  int&lt;lower=0&gt; click[N];
+}
+
+parameters {
+  real&lt;lower=0, upper=1&gt; theta[N] ;
+}
+
+model {
+  for (n in 1:N) {
+    click[n] ~ binomial(imp[n], theta[n]);
+  }
+}</code></pre>
+<p>Rの実行コードは以下のようにした．</p>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="id_03-01-00-sample-report.html#cb48-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> test_results</span>
+<span id="cb48-2"><a href="id_03-01-00-sample-report.html#cb48-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-3"><a href="id_03-01-00-sample-report.html#cb48-3" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb48-4"><a href="id_03-01-00-sample-report.html#cb48-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">N =</span> <span class="fu">nrow</span>(df),</span>
+<span id="cb48-5"><a href="id_03-01-00-sample-report.html#cb48-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">imp =</span> df<span class="sc">$</span>imp,</span>
+<span id="cb48-6"><a href="id_03-01-00-sample-report.html#cb48-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">click =</span> df<span class="sc">$</span>click</span>
+<span id="cb48-7"><a href="id_03-01-00-sample-report.html#cb48-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb48-8"><a href="id_03-01-00-sample-report.html#cb48-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-9"><a href="id_03-01-00-sample-report.html#cb48-9" aria-hidden="true" tabindex="-1"></a>fit_simple_model <span class="ot">&lt;-</span> rstan<span class="sc">::</span><span class="fu">stan</span>(</span>
+<span id="cb48-10"><a href="id_03-01-00-sample-report.html#cb48-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> model_path,</span>
+<span id="cb48-11"><a href="id_03-01-00-sample-report.html#cb48-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data,</span>
+<span id="cb48-12"><a href="id_03-01-00-sample-report.html#cb48-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">4000</span>,</span>
+<span id="cb48-13"><a href="id_03-01-00-sample-report.html#cb48-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">chain =</span> <span class="dv">4</span>,</span>
+<span id="cb48-14"><a href="id_03-01-00-sample-report.html#cb48-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">1234</span></span>
+<span id="cb48-15"><a href="id_03-01-00-sample-report.html#cb48-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>トレースプロット Figure <a href="id_03-01-00-sample-report.html#fig:traceplot-chap03-simple-01">3.1</a> を確認すると，問題なく収束していることが確認できる．</p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="id_03-01-00-sample-report.html#cb49-1" aria-hidden="true" tabindex="-1"></a>ggmcmc<span class="sc">::</span><span class="fu">ggs</span>(fit_simple_model) <span class="sc">%&gt;%</span> </span>
+<span id="cb49-2"><a href="id_03-01-00-sample-report.html#cb49-2" aria-hidden="true" tabindex="-1"></a>  ggmcmc<span class="sc">::</span><span class="fu">ggs_traceplot</span>()</span></code></pre></div>
+<div class="figure"><span style="display:block;" id="fig:traceplot-chap03-simple-01"></span>
+<img src="_main_files/figure-html/traceplot-chap03-simple-01-1.png" alt="thetaのMCMCのトレースプロット" width="672" />
+<p class="caption">
+Figure 3.1: thetaのMCMCのトレースプロット
+</p>
+</div>
+<p>次に推定された事後分布とその要約を確認しておこう．これらをTable <a href="id_03-01-00-sample-report.html#tab:summary-fit-simple-01">3.2</a> にまとめる．</p>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:summary-fit-simple-01">Table 3.2: </span>thetaの事後分布の要約
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+parameter
+</th>
+<th style="text-align:right;">
+mean
+</th>
+<th style="text-align:right;">
+sd
+</th>
+<th style="text-align:right;">
+lower
+</th>
+<th style="text-align:right;">
+upper
+</th>
+<th style="text-align:right;">
+hid_range
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+theta_A
+</td>
+<td style="text-align:right;">
+0.021
+</td>
+<td style="text-align:right;">
+0.007
+</td>
+<td style="text-align:right;">
+0.008
+</td>
+<td style="text-align:right;">
+0.034
+</td>
+<td style="text-align:right;">
+0.026
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+theta_B
+</td>
+<td style="text-align:right;">
+0.047
+</td>
+<td style="text-align:right;">
+0.011
+</td>
+<td style="text-align:right;">
+0.026
+</td>
+<td style="text-align:right;">
+0.068
+</td>
+<td style="text-align:right;">
+0.042
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+theta_C
+</td>
+<td style="text-align:right;">
+0.028
+</td>
+<td style="text-align:right;">
+0.008
+</td>
+<td style="text-align:right;">
+0.013
+</td>
+<td style="text-align:right;">
+0.044
+</td>
+<td style="text-align:right;">
+0.031
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+theta_D
+</td>
+<td style="text-align:right;">
+0.055
+</td>
+<td style="text-align:right;">
+0.024
+</td>
+<td style="text-align:right;">
+0.014
+</td>
+<td style="text-align:right;">
+0.104
+</td>
+<td style="text-align:right;">
+0.090
+</td>
+</tr>
+</tbody>
+</table>
+<p>また，事後分布の形状をFigure <a href="id_03-01-00-sample-report.html#fig:posterior-theta-simple-01">3.2</a> にまとめた．</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="id_03-01-00-sample-report.html#cb50-1" aria-hidden="true" tabindex="-1"></a>fit_simple_model <span class="sc">%&gt;%</span> </span>
+<span id="cb50-2"><a href="id_03-01-00-sample-report.html#cb50-2" aria-hidden="true" tabindex="-1"></a>  tidybayes<span class="sc">::</span><span class="fu">spread_draws</span>(theta[condition]) <span class="sc">%&gt;%</span> </span>
+<span id="cb50-3"><a href="id_03-01-00-sample-report.html#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb50-4"><a href="id_03-01-00-sample-report.html#cb50-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">condition =</span> <span class="fu">as.factor</span>(<span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>)[condition])</span>
+<span id="cb50-5"><a href="id_03-01-00-sample-report.html#cb50-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb50-6"><a href="id_03-01-00-sample-report.html#cb50-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">fct_rev</span>(condition), <span class="at">x =</span> theta),) <span class="sc">+</span> </span>
+<span id="cb50-7"><a href="id_03-01-00-sample-report.html#cb50-7" aria-hidden="true" tabindex="-1"></a>  tidybayes<span class="sc">::</span><span class="fu">stat_halfeye</span>(<span class="at">.width =</span> <span class="fu">c</span>(.<span class="dv">90</span>, .<span class="dv">5</span>), <span class="at">fill =</span> <span class="st">&quot;skyblue&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb50-8"><a href="id_03-01-00-sample-report.html#cb50-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="dv">0</span>, <span class="fl">0.18</span>) <span class="sc">+</span></span>
+<span id="cb50-9"><a href="id_03-01-00-sample-report.html#cb50-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">&quot;theta&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb50-10"><a href="id_03-01-00-sample-report.html#cb50-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">&quot;density&quot;</span>)</span></code></pre></div>
+<div class="figure"><span style="display:block;" id="fig:posterior-theta-simple-01"></span>
+<img src="_main_files/figure-html/posterior-theta-simple-01-1.png" alt="各パターンに対するthetaの事後分布" width="672" />
+<p class="caption">
+Figure 3.2: 各パターンに対するthetaの事後分布
+</p>
+</div>
+<p>平均を見るとA案が最もCTRが低く，D案が最もCTRが広いがDは表示回数が少ないため事後分布の裾が広くなっている．
+これよりB案とD案に絞り，これらの案が他より優れているかどうかを評価してみる．</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="id_03-01-00-sample-report.html#cb51-1" aria-hidden="true" tabindex="-1"></a>ms <span class="ot">&lt;-</span> rstan<span class="sc">::</span><span class="fu">extract</span>(fit_simple_model) <span class="sc">%&gt;%</span> </span>
+<span id="cb51-2"><a href="id_03-01-00-sample-report.html#cb51-2" aria-hidden="true" tabindex="-1"></a>  purrr<span class="sc">::</span><span class="fu">pluck</span>(<span class="st">&quot;theta&quot;</span>)</span>
+<span id="cb51-3"><a href="id_03-01-00-sample-report.html#cb51-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-4"><a href="id_03-01-00-sample-report.html#cb51-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb51-5"><a href="id_03-01-00-sample-report.html#cb51-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">Pattern =</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;C&quot;</span>),</span>
+<span id="cb51-6"><a href="id_03-01-00-sample-report.html#cb51-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;B&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">mean</span>(ms[,<span class="dv">2</span>] <span class="sc">-</span> ms[,<span class="dv">1</span>] <span class="sc">&gt;</span> <span class="dv">0</span>), <span class="fu">mean</span>(ms[,<span class="dv">2</span>] <span class="sc">-</span> ms[,<span class="dv">3</span>] <span class="sc">&gt;</span> <span class="dv">0</span>)) <span class="sc">%&gt;%</span> <span class="fu">round</span>(<span class="dv">3</span>),</span>
+<span id="cb51-7"><a href="id_03-01-00-sample-report.html#cb51-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;D&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">mean</span>(ms[,<span class="dv">4</span>] <span class="sc">-</span> ms[,<span class="dv">1</span>] <span class="sc">&gt;</span> <span class="dv">0</span>), <span class="fu">mean</span>(ms[,<span class="dv">4</span>] <span class="sc">-</span> ms[,<span class="dv">3</span>] <span class="sc">&gt;</span> <span class="dv">0</span>)) <span class="sc">%&gt;%</span> <span class="fu">round</span>(<span class="dv">3</span>)</span>
+<span id="cb51-8"><a href="id_03-01-00-sample-report.html#cb51-8" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb51-9"><a href="id_03-01-00-sample-report.html#cb51-9" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb51-10"><a href="id_03-01-00-sample-report.html#cb51-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;B,D案とA,C案の比較&quot;</span>,</span>
+<span id="cb51-11"><a href="id_03-01-00-sample-report.html#cb51-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="st">&quot;comparing-simple-model-bd-to-ac&quot;</span></span>
+<span id="cb51-12"><a href="id_03-01-00-sample-report.html#cb51-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<table>
+<caption>
+<span id="tab:comparing-simple-model-bd-to-ac">Table 3.3: </span>B,D案とA,C案の比較
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Pattern
+</th>
+<th style="text-align:right;">
+B
+</th>
+<th style="text-align:right;">
+D
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:right;">
+0.979
+</td>
+<td style="text-align:right;">
+0.942
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+C
+</td>
+<td style="text-align:right;">
+0.931
+</td>
+<td style="text-align:right;">
+0.879
+</td>
+</tr>
+</tbody>
+</table>
+<p>B案がA案よりも優れている割合は95%を超えているものの，D案とA案の比較では95%を若干下回っている．</p>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="id_03-00-00-test-with-combinations.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="id_03-02-00-modelling-1.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": [["docs/webops-and-ml-in-r.pdf", "PDF"]],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+},
+"info": false
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

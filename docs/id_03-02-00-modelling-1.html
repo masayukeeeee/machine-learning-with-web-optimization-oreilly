@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Page not found | ウェブ最適化ではじめる機械学習 in R</title>
+  <title>3.2 モデリング1 | ウェブ最適化ではじめる機械学習 in R</title>
   <meta name="description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
   <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Page not found | ウェブ最適化ではじめる機械学習 in R" />
+  <meta property="og:title" content="3.2 モデリング1 | ウェブ最適化ではじめる機械学習 in R" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
   <meta name="github-repo" content="https://github.com/masayukeeeee/machine-learning-with-web-optimization-oreilly-in-r.github.io" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Page not found | ウェブ最適化ではじめる機械学習 in R" />
+  <meta name="twitter:title" content="3.2 モデリング1 | ウェブ最適化ではじめる機械学習 in R" />
   
   <meta name="twitter:description" content="ウェブ最適化ではじめる機械学習 O’REIILYをRでやってみた，のまとめです" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-
-
+<link rel="prev" href="id_03-01-00-sample-report.html"/>
+<link rel="next" href="id_03-03-00-ダミー変数.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -242,19 +242,152 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="page-not-found" class="section level1">
-<h1>Page not found</h1>
-<p>The page you requested cannot be found (perhaps it was moved or renamed).</p>
-<p>You may want to try searching to find the page's new location, or use
-the table of contents to find the page you are looking for.</p>
+<div id="id_03-02-00-modelling-1" class="section level2 hasAnchor" number="3.2">
+<h2><span class="header-section-number">3.2</span> モデリング1<a href="id_03-02-00-modelling-1.html#id_03-02-00-modelling-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>要素案の効果を考慮するために以下のようなEquation <a href="id_03-02-00-modelling-1.html#eq:chap03-model-02">(3.2)</a> で定義されるモデルがより適切として議論を進める．</p>
+<p><span class="math display" id="eq:chap03-model-02">\[\begin{align}
+\begin{aligned}
+  \alpha &amp;\sim N(\mu_0, \sigma_0) \\
+  \beta_{\text{banner}} &amp;\sim N(\mu_1, \sigma_1) \\
+  \beta_{\text{button}} &amp;\sim N(\mu_2, \sigma_2) \\
+  \theta &amp;= \text{logistic}(\alpha + \beta_1 + \beta_2) \\
+  \text{Click} &amp;\sim \text{Binomial}(\text{Impression}, \theta)
+\end{aligned}
+\tag{3.2}
+\end{align}\]</span></p>
+<p>ここではデザインで変更を加えた要素に関する情報をダミー変数として持たせ，その効果をモデルに加えている．
+対応してダミー変数をデータに加えておく．</p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="id_03-02-00-modelling-1.html#cb52-1" aria-hidden="true" tabindex="-1"></a>test_results_2 <span class="ot">&lt;-</span> test_results <span class="sc">%&gt;%</span></span>
+<span id="cb52-2"><a href="id_03-02-00-modelling-1.html#cb52-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ctr =</span> <span class="fu">round</span>(ctr, <span class="dv">4</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb52-3"><a href="id_03-02-00-modelling-1.html#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb52-4"><a href="id_03-02-00-modelling-1.html#cb52-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">img =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb52-5"><a href="id_03-02-00-modelling-1.html#cb52-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">btn =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb52-6"><a href="id_03-02-00-modelling-1.html#cb52-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb52-7"><a href="id_03-02-00-modelling-1.html#cb52-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(pattern, img, btn, <span class="fu">everything</span>())</span>
+<span id="cb52-8"><a href="id_03-02-00-modelling-1.html#cb52-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-9"><a href="id_03-02-00-modelling-1.html#cb52-9" aria-hidden="true" tabindex="-1"></a>test_results_2 <span class="sc">%&gt;%</span> </span>
+<span id="cb52-10"><a href="id_03-02-00-modelling-1.html#cb52-10" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb52-11"><a href="id_03-02-00-modelling-1.html#cb52-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;LPのデザイン表示テスト結果&quot;</span>,</span>
+<span id="cb52-12"><a href="id_03-02-00-modelling-1.html#cb52-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="st">&quot;sample-data-chapter-03&quot;</span></span>
+<span id="cb52-13"><a href="id_03-02-00-modelling-1.html#cb52-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb52-14"><a href="id_03-02-00-modelling-1.html#cb52-14" aria-hidden="true" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:sample-data-chapter-03">Table 3.1: </span>LPのデザイン表示テスト結果
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+pattern
+</th>
+<th style="text-align:right;">
+img
+</th>
+<th style="text-align:right;">
+btn
+</th>
+<th style="text-align:right;">
+imp
+</th>
+<th style="text-align:right;">
+click
+</th>
+<th style="text-align:right;">
+ctr
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+434
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+0.0184
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+382
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+0.0445
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+C
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+394
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+0.0254
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+D
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+88
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+0.0455
+</td>
+</tr>
+</tbody>
+</table>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-
-
+<a href="id_03-01-00-sample-report.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="id_03-03-00-ダミー変数.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

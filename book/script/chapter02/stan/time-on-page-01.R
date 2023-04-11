@@ -16,8 +16,8 @@ fit_time_on_page <- rstan::stan(
   chain = 4
 )
 
-# saveRDS(fit_time_on_page,
-#         "book/script/chapter02/stan/time-on-page-01.obj")
+#saveRDS(fit_time_on_page,
+#        "book/script/chapter02/stan/time-on-page-01.obj")
 
 # 収束は問題なさそう
 stan_results <- ggmcmc::ggs(fit_time_on_page)
